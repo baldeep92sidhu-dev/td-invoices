@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>T&amp;D Carriers LTD</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:Arial,sans-serif;background:#d0d0d0;padding:16px;}
+
+/* APP TABS */
+.app-tabs{display:flex;max-width:820px;margin:0 auto 0;gap:0;}
+.app-tab{flex:1;padding:10px 8px;border:none;background:#1a237e;color:#9fa8da;font-size:13px;font-weight:800;cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;}
+.app-tab.active{color:#ffd600;border-bottom-color:#ffd600;background:#0d1757;}
+.app-tab:hover{background:#0d1757;}
+
+/* APPS */
+.app{display:none;}
+.app.active{display:block;}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:8px;margin-bottom:14px;justify-content:flex-end;flex-wrap:wrap;max-width:820px;margin-left:auto;margin-right:auto;}
+.btn{padding:9px 16px;border:none;border-radius:15px;font-size:13px;font-weight:bold;cursor:pointer;transition:opacity .15s;}
+.btn-green{background:#2e7d32;color:#fff;}
+.btn-blue{background:#1565c0;color:#fff;}
+.btn-orange{background:#e65100;color:#fff;}
+.btn-red{background:#b71c1c;color:#fff;}
+.btn:hover{opacity:0.82;}
+.invoice{background:#fff;width:100%;max-width:820px;margin:0 auto;padding:22px;border:1px solid #bbb;}
+
+/* Header */
+.header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.company-info{font-weight:bold;color:#1a237e;font-size:15px;line-height:1.75;margin-left:18px;}
+.company-name{font-size:20px;font-weight:900;color:#1a237e;}
+.logo-box{width:151px;height:126px;border:none;display:flex;align-items:center;justify-content:center;overflow:hidden;background:transparent;margin-right:18px;}
+.logo-box img{width:100%;height:100%;object-fit:contain;}
+
+.title-bar{background:#c8e6c9;border-top:3px solid #388e3c;border-bottom:3px solid #388e3c;text-align:center;padding:5px 0;margin:8px 0;}
+.inv-title{font-size:28px;font-weight:900;color:#1a237e;font-style:italic;letter-spacing:2px;}
+
+/* Tables */
+table.g{width:100%;border-collapse:collapse;font-size:12px;}
+table.g td,table.g th{border:1px solid #999;padding:2px 6px;vertical-align:top;}
+.sh{background:#c8e6c9;font-weight:bold;color:#1a237e;}
+.yc{background:#ffd600;font-weight:bold;color:#000;}
+.ac{background:#c8e6c9;font-weight:bold;color:#1a237e;text-align:center;}
+.ar{background:#ffd600;font-weight:bold;text-align:right;}
+
+/* Inputs */
+input[type=text],input[type=number],input[type=date]{border:1px dashed #bbb;padding:2px 4px;width:100%;font-size:12px;font-family:Arial;background:#fffde7;}
+input.req-field{border:1px dashed #bbb;}
+input.req-error{border:1px solid #c62828!important;background:#ffebee!important;}
+select{border:1px solid #1a237e;padding:2px 4px;width:100%;font-size:12px;font-family:Arial;background:#e3f2fd;color:#0d47a1;font-weight:bold;cursor:pointer;}
+textarea{border:1px dashed #bbb;padding:2px 4px;width:100%;font-size:12px;font-family:Arial;background:#fffde7;resize:none;height:34px;}
+
+/* Totals */
+.sub-sec{display:flex;justify-content:flex-end;border-top:2px solid #388e3c;padding-top:8px;margin-top:8px;}
+table.tot{border-collapse:collapse;font-size:12px;min-width:270px;}
+table.tot td{border:1px solid #999;padding:4px 7px;}
+.footer-bar{background:#c8e6c9;border-top:3px solid #388e3c;border-bottom:3px solid #388e3c;text-align:center;padding:7px 0;margin-top:8px;font-weight:bold;font-size:14px;color:#1a237e;}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:#fff;border:2px solid #1a237e;border-radius:8px;padding:22px;width:380px;max-width:95vw;}
+.modal-box h3{color:#1a237e;font-size:15px;margin-bottom:14px;border-bottom:2px solid #c8e6c9;padding-bottom:6px;}
+.modal-box label{font-size:12px;font-weight:bold;color:#1a237e;display:block;margin-top:8px;margin-bottom:2px;}
+.modal-box input{width:100%;border:1px solid #bbb;padding:4px 6px;font-size:12px;border-radius:3px;}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;}
+
+/* DB Panel */
+.dbpanel{background:#fff;max-width:820px;margin:10px auto 0;border:1px solid #bbb;padding:14px;font-size:12px;display:none;}
+.dbpanel h3{color:#1a237e;margin-bottom:8px;}
+.db-toolbar{display:flex;gap:6px;margin-bottom:8px;}
+table.dbt{border-collapse:collapse;width:100%;font-size:11px;}
+table.dbt th{background:#c8e6c9;padding:4px 6px;border:1px solid #999;color:#1a237e;white-space:nowrap;}
+table.dbt td{padding:3px 6px;border:1px solid #ddd;white-space:nowrap;}
+table.dbt tr:nth-child(even){background:#f9f9f9;}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:#1a237e;color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:bold;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.show{opacity:1;}
+
+/* ── PAYMENT TRACKER ── */
+.tracker-wrap{max-width:820px;margin:0 auto;}
+.summary-bar{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;background:#ddd;margin-bottom:10px;}
+.sum-box{background:#fff;padding:12px 8px;text-align:center;}
+.sum-box .slbl{font-size:11px;font-weight:700;text-transform:uppercase;color:#888;margin-bottom:3px;}
+.sum-box .sval{font-size:16px;font-weight:900;}
+.sum-box.s-paid .sval{color:#2e7d32;}
+.sum-box.s-pending .sval{color:#b71c1c;}
+.sum-box.s-partial .sval{color:#e65100;}
+.sum-box.s-total .sval{color:#1a237e;}
+.filter-tabs{display:flex;background:#fff;border-bottom:2px solid #ddd;margin-bottom:10px;}
+.ftab{padding:9px 18px;font-size:12px;font-weight:700;color:#888;border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;}
+.ftab.active{color:#1a237e;border-bottom-color:#1a237e;}
+.pay-card{background:#fff;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.1);margin-bottom:10px;overflow:hidden;border-left:5px solid #ddd;}
+.pay-card.paid{border-left-color:#2e7d32;}
+.pay-card.pending{border-left-color:#b71c1c;}
+.pay-card.partial{border-left-color:#e65100;}
+.pay-card-hdr{background:#f5f5f5;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;}
+.pay-invno{font-size:16px;font-weight:900;color:#1a237e;}
+.pay-invdate{font-size:11px;color:#888;}
+.sbadge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;text-transform:uppercase;}
+.sbadge.paid{background:#e8f5e9;color:#2e7d32;}
+.sbadge.pending{background:#ffebee;color:#b71c1c;}
+.sbadge.partial{background:#fff3e0;color:#e65100;}
+.pay-card-body{padding:8px 14px 10px;font-size:13px;}
+.prow{display:flex;justify-content:space-between;margin-bottom:3px;}
+.prow .pk{color:#888;}
+.prow .pv{font-weight:600;text-align:right;max-width:55%;}
+.amt-section{display:flex;justify-content:space-between;align-items:flex-end;margin-top:8px;padding-top:8px;border-top:1px solid #eee;}
+.pay-total{font-size:15px;font-weight:900;color:#1a237e;}
+.paid-lbl{font-size:12px;font-weight:700;color:#2e7d32;}
+.owed-lbl{font-size:12px;font-weight:700;color:#b71c1c;}
+.partial-lbl{font-size:12px;font-weight:700;color:#e65100;}
+.pay-card-footer{display:flex;gap:5px;padding:8px 14px;border-top:1px solid #eee;}
+.pay-card-footer button{flex:1;padding:7px 4px;border:none;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;}
+.pbtn-paid{background:#e8f5e9;color:#2e7d32;}
+.pbtn-partial{background:#fff3e0;color:#e65100;}
+.pbtn-pending{background:#ffebee;color:#b71c1c;}
+.pbtn-detail{background:#e8eaf6;color:#1a237e;}
+.partial-form{background:#fff3e0;padding:10px 14px;border-top:1px solid #ffe0b2;display:none;}
+.partial-form.show{display:block;}
+.pf-row{display:flex;gap:6px;margin-top:6px;}
+.pf-row input{flex:1;padding:6px 8px;border:1.5px solid #ffb74d;border-radius:5px;font-size:13px;background:#fff;font-family:Arial;}
+.pf-apply{padding:6px 12px;background:#e65100;color:#fff;border:none;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer;}
+/* Detail modal */
+.detail-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center;}
+.detail-modal.show{display:flex;}
+.detail-box{background:#fff;border-radius:8px;padding:20px;width:460px;max-width:95vw;max-height:85vh;overflow-y:auto;}
+.detail-box h3{color:#1a237e;margin-bottom:12px;font-size:15px;border-bottom:2px solid #c8e6c9;padding-bottom:6px;}
+.drow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:13px;}
+.drow:last-child{border-bottom:none;}
+.drow .dk{color:#888;}
+.drow .dv{font-weight:700;text-align:right;max-width:55%;}
+.dsec{font-size:11px;font-weight:800;color:#999;text-transform:uppercase;margin:12px 0 5px;}
+.ph-item{background:#f9f9f9;border-radius:6px;padding:8px 10px;margin-bottom:5px;font-size:12px;position:relative;}
+.ph-date{color:#888;margin-bottom:2px;}
+.ph-amt{font-weight:800;color:#2e7d32;}
+.ph-note{color:#555;margin-top:2px;}
+.ph-del{position:absolute;top:6px;right:8px;background:#ffebee;color:#b71c1c;border:none;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;cursor:pointer;}
+.add-pay-box{background:#e8f5e9;border-radius:8px;padding:12px;margin-top:10px;}
+.add-pay-box label{font-size:11px;font-weight:700;color:#2e7d32;text-transform:uppercase;display:block;margin-bottom:3px;}
+.add-pay-box input,.add-pay-box textarea{width:100%;padding:7px 10px;border:1.5px solid #a5d6a7;border-radius:6px;font-size:14px;font-family:Arial;background:#fff;margin-bottom:7px;}
+.add-pay-box textarea{resize:none;height:40px;font-size:12px;}
+.add-pay-btn{width:100%;padding:9px;background:#2e7d32;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;}
+.tracker-toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+/* Reports */
+.rcard{background:#fff;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:10px;overflow:hidden;}
+.rcard-hdr{padding:10px 14px;font-size:13px;font-weight:700;color:#fff;background:#1a237e;}
+.rcard-hdr.rg{background:#2e7d32;}
+.rcard-hdr.ro{background:#e65100;}
+.rcard-hdr.rr{background:#b71c1c;}
+.rcard-body{padding:10px 14px;}
+.rrow{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:13px;}
+.rrow:last-child{border-bottom:none;}
+.rrow .rk{color:#555;}
+.rrow .rv{font-weight:800;}
+.rv-g{color:#2e7d32;} .rv-r{color:#b71c1c;} .rv-o{color:#e65100;}
+.tracker-pages .tpage{display:none;}
+.tracker-pages .tpage.active{display:block;}
+.tracker-ptabs{display:flex;background:#fff;border-bottom:2px solid #ddd;margin-bottom:10px;}
+
+@media print{
+  .toolbar,.dbpanel,.no-print,.modal-overlay,.app-tabs,.detail-modal{display:none!important;}
+  body{background:#fff;padding:0;}
+  .invoice{border:none;max-width:100%;}
+  .app{display:block!important;}
+  #app-tracker{display:none!important;}
+  input,select,textarea{border:none!important;background:transparent!important;-webkit-appearance:none;}
+  select{color:#000!important;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- Add Company Modal -->
+<div class="modal-overlay" id="addCoModal">
+  <div class="modal-box">
+    <h3>Add New Company</h3>
+    <label>Company Name *</label><input type="text" id="mName" placeholder="Required">
+    <label>Address Line 1</label><input type="text" id="mAddr1" placeholder="Street address">
+    <label>City, Province/State</label><input type="text" id="mAddr2" placeholder="e.g. Toronto, ON">
+    <label>Postal / ZIP Code</label><input type="text" id="mPostal" placeholder="e.g. M9W 7B9">
+    <label>Phone</label><input type="text" id="mPhone">
+    <label>Email</label><input type="text" id="mEmail">
+    <div style="margin-top:10px;">
+      <label style="font-size:11px;color:#333;">Save to list:</label>
+      <select id="mListTarget" style="margin-top:2px;">
+        <option value="bill">Bill To</option>
+        <option value="from">From / To</option>
+        <option value="both">Both lists</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-red" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-green" onclick="saveNewCompany()">Save Company</button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Detail Modal -->
+<div class="detail-modal" id="detailModal">
+  <div class="detail-box">
+    <h3 id="detailTitle">Invoice Details</h3>
+    <div id="detailBody"></div>
+    <div style="text-align:right;margin-top:14px;">
+      <button class="btn btn-red" onclick="closeDetail()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP TABS -->
+<div class="app-tabs">
+  <button class="app-tab active" id="tab-invoice" onclick="switchApp('invoice')">📄 Invoice</button>
+  <button class="app-tab" id="tab-tracker" onclick="switchApp('tracker')">📊 Payment Tracker</button>
+</div>
+
+<!-- ══════════════════ INVOICE APP ══════════════════ -->
+<div class="app active" id="app-invoice">
+  <div class="toolbar no-print" style="margin-top:8px;">
+    <button class="btn btn-orange" onclick="toggleDB()">📄 View Saved Invoices</button>
+    <button class="btn btn-green" onclick="openAddCompany()">🏢 Add Company</button>
+    <button class="btn btn-green" onclick="newInvoice()">+ New Invoice</button>
+    <button class="btn btn-blue" onclick="saveInvoice()">💾 Save Invoice</button>
+    <button class="btn btn-blue" onclick="exportPDF()">🖨 Save as PDF</button>
+    <button class="btn btn-green" onclick="exportExcel()">📊 Export DB to Excel</button>
+  </div>
+
+  <div class="invoice" id="invoice">
+    <div class="header-top" style="gap:12px;padding:0 18px;">
+      <div class="company-info">
+        <div class="company-name">T&amp;D Carriers LTD</div>
+        <div>6 Shortill Rd</div>
+        <div>Ballinafad, ON</div>
+        <div>N0B-1H0</div>
+        <div>Phone: 431-887-7127</div>
+      </div>
+      <div class="logo-box" id="logoBox">
+        <img src="data:image/jpeg;base64,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" alt="T&amp;D Carriers Logo" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+    </div>
+
+    <div class="title-bar"><span class="inv-title">invoice</span></div>
+
+    <!-- Bill To + Invoice # -->
+    <table class="g">
+      <tr>
+        <td style="width:50%" rowspan="4" valign="top">
+          <span class="sh" style="display:block;padding:10px 4px;">Bill To:</span>
+          <div style="margin:2px 0 4px;">
+            <select id="selBillTo" onchange="fillBillTo(this.value)">
+              <option value="">-- Select Company --</option>
+            </select>
+          </div>
+          <input type="text" id="btName" placeholder="Company Name" class="req-field" style="margin-bottom:2px;">
+          <input type="text" id="btAddr1" placeholder="Address 1" style="margin-bottom:2px;">
+          <input type="text" id="btAddr2" placeholder="City, Province" style="margin-bottom:2px;">
+          <input type="text" id="btPostal" placeholder="Postal Code" style="margin-bottom:2px;">
+          <input type="text" id="btPhone" placeholder="Phone" style="margin-bottom:2px;">
+          <input type="text" id="btEmail" placeholder="Email">
+        </td>
+        <td style="width:20%;font-weight:bold;color:#1a237e;height:10px;">Invoice Number:</td>
+        <td class="yc" style="height:10px;"><input type="text" id="invNum" value="1142" style="background:transparent;border:none;font-size:18px;font-weight:900;text-align:center;width:100%;"></td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;color:#1a237e;height:10px;">Date:</td>
+        <td style="height:10px;"><input type="date" id="invDate"></td>
+      </tr>
+      <tr><td colspan="2" style="border:none;height:4px;"></td></tr>
+      <tr><td colspan="2" style="border:none;height:4px;"></td></tr>
+    </table>
+
+    <!-- From / To / Trip -->
+    <table class="g" style="margin-top:5px;">
+      <tr>
+        <td style="width:34%" class="sh">From:</td>
+        <td style="width:34%" class="sh">To:</td>
+        <td style="width:12%;font-weight:bold;color:#1a237e;background:#c8e6c9;">Trip:</td>
+        <td class="yc" style="width:20%"><input type="text" id="tripNum" placeholder="Trip #" class="req-field" style="background:transparent;border:none;font-weight:900;font-size:14px;text-align:right;width:100%;"></td>
+      </tr>
+      <tr>
+        <td valign="top">
+          <select id="selFrom" onchange="fillFrom(this.value)" style="margin-bottom:4px;"><option value="">-- Select Company --</option></select>
+          <input type="text" id="frName" placeholder="Company" class="req-field" style="margin-bottom:2px;">
+          <input type="text" id="frAddr1" placeholder="Address 1" style="margin-bottom:2px;">
+          <input type="text" id="frAddr2" placeholder="City, Province" style="margin-bottom:2px;">
+          <input type="text" id="frPostal" placeholder="Postal/ZIP" style="margin-bottom:2px;">
+          <input type="text" id="frPhone" placeholder="Phone">
+        </td>
+        <td valign="top">
+          <select id="selTo" onchange="fillTo(this.value)" style="margin-bottom:4px;"><option value="">-- Select Company --</option></select>
+          <input type="text" id="toName" placeholder="Company" class="req-field" style="margin-bottom:2px;">
+          <input type="text" id="toAddr1" placeholder="Address 1" style="margin-bottom:2px;">
+          <input type="text" id="toAddr2" placeholder="City, Province" style="margin-bottom:2px;">
+          <input type="text" id="toPostal" placeholder="Postal/ZIP" style="margin-bottom:2px;">
+          <input type="text" id="toPhone" placeholder="Phone">
+        </td>
+        <td colspan="2" valign="top">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Po Number</td><td style="border:1px solid #999;padding:2px 4px;"><input type="text" id="poNum" class="req-field" style="width:100%;border:none;background:transparent;"></td></tr>
+            <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Seal Number</td><td style="border:1px solid #999;padding:2px 4px;"><input type="text" id="sealNum" class="req-field" style="width:100%;border:none;background:transparent;"></td></tr>
+            <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Pickups</td><td style="border:1px solid #999;padding:2px 4px;"><input type="text" id="pickups" style="width:100%;border:none;background:transparent;"></td></tr>
+            <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Drops</td><td style="border:1px solid #999;padding:2px 4px;"><input type="text" id="drops" style="width:100%;border:none;background:transparent;"></td></tr>
+            <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Trailer</td><td style="border:1px solid #999;padding:2px 4px;"><input type="text" id="trailer" class="req-field" style="width:100%;border:none;background:transparent;"></td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Activity rows -->
+    <table class="g" style="margin-top:5px;">
+      <tr>
+        <td class="ac" style="width:60%">Activity</td>
+        <td class="ac" style="width:20%">Rate</td>
+        <td class="ac" style="width:20%">Amount</td>
+      </tr>
+      <tr><td><input type="text" id="act1" class="req-field" placeholder="Activity description"></td><td><input type="number" id="rate1" class="req-field" oninput="calc()" placeholder="0.00"></td><td class="ar" id="amt1"></td></tr>
+      <tr><td><input type="text" id="act2" placeholder=""></td><td><input type="number" id="rate2" oninput="calc()" placeholder=""></td><td class="ar" id="amt2"></td></tr>
+      <tr><td><input type="text" id="act3" placeholder=""></td><td><input type="number" id="rate3" oninput="calc()" placeholder=""></td><td class="ar" id="amt3"></td></tr>
+      <tr>
+        <td colspan="3">
+          <span style="font-weight:bold;color:#1a237e;font-size:12px;">Remarks:</span>
+          <textarea id="remarks" style="height:22px;resize:none;"></textarea>
+          <div style="margin-top:5px;font-size:12px;font-weight:bold;color:#1a237e;">Make cheques payable to: <span style="color:#1565c0;">dispatch@tdcarriers.ca</span></div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Footer totals -->
+    <div class="sub-sec">
+      <table class="tot">
+        <tr><td style="font-weight:bold;color:#1a237e;">Subtotal</td><td style="text-align:right;min-width:110px;" id="subtotalCell">$0.00</td></tr>
+        <tr><td style="font-weight:bold;color:#1a237e;">Total</td><td style="text-align:right;" id="totalCell">$0.00</td></tr>
+        <tr>
+          <td style="font-weight:bold;color:#1a237e;">Balance Due:</td>
+          <td class="yc" style="text-align:right;vertical-align:middle;">
+            <select id="currSelect" onchange="setCurrency(this.value)" style="display:inline-block;width:auto;font-size:11px;font-weight:bold;padding:1px 4px;background:#fff8dc;color:#1a237e;border:1px solid #1a237e;border-radius:3px;margin-right:4px;">
+              <option value="CDN">$CDN</option>
+              <option value="USD">$USD</option>
+            </select>
+            <span id="balanceCell">$0.00</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="footer-bar">Thank you for your Business With Us</div>
+  </div>
+
+  <div class="dbpanel no-print" id="dbpanel">
+    <h3>📄 Saved Invoices Database</h3>
+    <div class="db-toolbar">
+      <button class="btn btn-green" onclick="exportExcel()" style="font-size:11px;padding:6px 12px;">📊 Export to Excel</button>
+      <button class="btn btn-red" onclick="clearAllInvoices()" style="font-size:11px;padding:6px 12px;">🗑 Clear All</button>
+    </div>
+    <div id="dbContent"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ PAYMENT TRACKER APP ══════════════════ -->
+<div class="app" id="app-tracker">
+  <div class="tracker-wrap">
+    <div class="tracker-toolbar" style="margin-top:8px;">
+      <button class="btn btn-blue" onclick="syncTracker()">🔄 Sync Invoices</button>
+      <button class="btn btn-green" onclick="showTPage('list')">📄 Invoices</button>
+      <button class="btn btn-orange" onclick="showTPage('reports')">📊 Reports</button>
+    </div>
+    <div class="summary-bar">
+      <div class="sum-box s-paid"><div class="slbl">Paid</div><div class="sval" id="sumPaid">0</div></div>
+      <div class="sum-box s-pending"><div class="slbl">Pending</div><div class="sval" id="sumPending">0</div></div>
+      <div class="sum-box s-partial"><div class="slbl">Partial</div><div class="sval" id="sumPartial">0</div></div>
+      <div class="sum-box s-total"><div class="slbl">Total</div><div class="sval" id="sumTotal">0</div></div>
+    </div>
+    <div class="filter-tabs">
+      <button class="ftab active" data-filter="all">All</button>
+      <button class="ftab" data-filter="pending">⚠ Pending</button>
+      <button class="ftab" data-filter="partial">◑ Partial</button>
+      <button class="ftab" data-filter="paid">✓ Paid</button>
+    </div>
+    <div class="tracker-pages">
+      <div class="tpage active" id="tpage-list"><div id="payList"></div></div>
+      <div class="tpage" id="tpage-reports"><div id="reportsContent"></div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ================================================================
+// SHARED STATE
+// ================================================================
+var currentCurrency = localStorage.getItem('td_currency') || 'CDN';
+var currentFilter = 'all';
+var currentDetailInv = null;
+
+var billToDB = JSON.parse(localStorage.getItem('td_billto')||'null')||[
+  {name:"Jagger Canada",a1:"53 Hullen Cresent",a2:"Etobicoke,ON",a3:"M9W7B9",ph:"9056129741",em:"sidhubaldeep44@gmail.com"},
+  {name:"Accord Transportation Ltd",a1:"801-17665 66A Ave.",a2:"Surrey,BC",a3:"V3S 2A7",ph:"604 575 7500",em:"payable@accordtransportation.com"},
+  {name:"Klare Logistics Inc.",a1:"520 Charolais Blvd, Po Box 54054",a2:"Brampton,ON",a3:"L6Y5Y9",ph:"289 505 0924",em:"operations@klarelogistics.com"}
+];
+var fromToDB = JSON.parse(localStorage.getItem('td_from')||'null')||[
+  {name:"Ceva Mississauga",a1:"5650 Keaton Crescent",a2:"Mississauga,ON",a3:"L5R3H5",ph:"",em:""},
+  {name:"Ceva Calgary",a1:"127-250 Aero Link NE",a2:"Calgary,AB",a3:"T2E4Y9",ph:"",em:""},
+  {name:"Parkland Couriers",a1:"9742 279 Street",a2:"Acheson,AB",a3:"T7X6J4",ph:"",em:""},
+  {name:"GOODWILL INDUSTRIES",a1:"1285 INDUSTRIAL DRIVE",a2:"Chillicothe,OH",a3:"45601",ph:"",em:""},
+  {name:"MultiMatic Inmet",a1:"35 W Wilmot St.",a2:"Richmond Hill,ON",a3:"L4B 1L7",ph:"905 764 5120",em:""},
+  {name:"KW Chilli c/o MJM -KC44",a1:"1410 Lancaster Rd",a2:"Chillicothe,OH",a3:"45601",ph:"740 774 5223",em:""},
+  {name:"Chalmers Suspensions Int.Inc",a1:"6400 Northam Dr",a2:"Mississauga,ON",a3:"L4V 1J1",ph:"905 362 6400",em:""},
+  {name:"Orbis",a1:"5838 State Rte 159",a2:"Chillicothe,OH",a3:"45601",ph:"262-560-5737",em:""},
+  {name:"DBG Canada Ltd.",a1:"1566 Shawson Dr",a2:"Mississauga,ON",a3:"L4W 1N7",ph:"416 508 6903",em:""},
+  {name:"KW CHILLI C/O RIFFLE BLDG 1 KC06",a1:"5746 STATE RTE 159",a2:"Chillicothe,OH",a3:"45601",ph:"",em:""},
+  {name:"AMINO NORTH AMERICA",a1:"15 HIGHBURY DR",a2:"ST. THOMAS,ON",a3:"N5P 4M1",ph:"",em:""},
+  {name:"KENWORTH CHILLICOTHE KC00",a1:"65 KENWORTH DR",a2:"Chillicothe,OH",a3:"45601",ph:"740 774 5223",em:""},
+  {name:"BASSI TRADE CO. LTD.",a1:"500 BARMAC DRIVE UNIT 2",a2:"TORONTO,ON",a3:"M9L 2X8",ph:"",em:""}
+];
+var savedInvoices = JSON.parse(localStorage.getItem('td_invoices')||'[]');
+var payments = JSON.parse(localStorage.getItem('td_payments')||'{}');
+
+function saveCoDB(){ localStorage.setItem('td_billto',JSON.stringify(billToDB)); localStorage.setItem('td_from',JSON.stringify(fromToDB)); }
+function persistInvoices(){ localStorage.setItem('td_invoices',JSON.stringify(savedInvoices)); }
+function savePayments(){ localStorage.setItem('td_payments',JSON.stringify(payments)); }
+
+// ================================================================
+// APP SWITCHING
+// ================================================================
+function switchApp(name) {
+  document.querySelectorAll('.app').forEach(function(a){ a.classList.remove('active'); });
+  document.querySelectorAll('.app-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('app-'+name).classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='tracker') syncTracker();
+}
+
+// ================================================================
+// CURRENCY
+// ================================================================
+function setCurrency(c){
+  currentCurrency=c;
+  var sel=document.getElementById('currSelect'); if(sel) sel.value=c;
+  calc();
+  localStorage.setItem('td_currency',c);
+}
+
+// FIX: fmt() now correctly shows currency symbol
+function fmt(n){
+  // Numbers only — no currency symbol in Amount/Subtotal/Total/Balance
+  return Number(n||0).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function fmtC(n,cur){
+  // Numbers only — currency shown via dropdown selection
+  return Number(n||0).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+// ================================================================
+// DROPDOWNS
+// ================================================================
+function populateSelect(selId,db){ var sel=document.getElementById(selId); var cur=sel.value; sel.innerHTML='<option value="">-- Select Company --</option>'; db.forEach(function(c,i){ var o=document.createElement('option'); o.value=i; o.textContent=c.name; sel.appendChild(o); }); sel.value=cur; }
+function refreshAllSelects(){ populateSelect('selBillTo',billToDB); populateSelect('selFrom',fromToDB); populateSelect('selTo',fromToDB); }
+function fillFields(db,idx,prefix){ if(idx==='') return; var c=db[parseInt(idx)]; if(!c) return; document.getElementById(prefix+'Name').value=c.name; document.getElementById(prefix+'Addr1').value=c.a1||''; document.getElementById(prefix+'Addr2').value=c.a2||''; document.getElementById(prefix+'Postal').value=c.a3||''; document.getElementById(prefix+'Phone').value=c.ph||''; if(document.getElementById(prefix+'Email')) document.getElementById(prefix+'Email').value=c.em||''; }
+function fillBillTo(v){ fillFields(billToDB,v,'bt'); }
+function fillFrom(v){ fillFields(fromToDB,v,'fr'); }
+function fillTo(v){ fillFields(fromToDB,v,'to'); }
+
+// ================================================================
+// ADD COMPANY
+// ================================================================
+function openAddCompany(){ ['mName','mAddr1','mAddr2','mPostal','mPhone','mEmail'].forEach(function(id){ document.getElementById(id).value=''; }); document.getElementById('addCoModal').classList.add('show'); document.getElementById('mName').focus(); }
+function closeModal(){ document.getElementById('addCoModal').classList.remove('show'); }
+function saveNewCompany(){
+  var name=document.getElementById('mName').value.trim(); if(!name){ alert('Company name is required.'); return; }
+  var co={name:name,a1:document.getElementById('mAddr1').value.trim(),a2:document.getElementById('mAddr2').value.trim(),a3:document.getElementById('mPostal').value.trim(),ph:document.getElementById('mPhone').value.trim(),em:document.getElementById('mEmail').value.trim()};
+  var t=document.getElementById('mListTarget').value;
+  if(t==='bill'||t==='both') billToDB.push(co);
+  if(t==='from'||t==='both') fromToDB.push(co);
+  saveCoDB(); refreshAllSelects(); closeModal(); showToast('Company "'+name+'" saved!');
+}
+document.getElementById('addCoModal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+
+// ================================================================
+// CALC
+// ================================================================
+function calc(){
+  var t=0;
+  [1,2,3].forEach(function(i){ var r=parseFloat(document.getElementById('rate'+i).value)||0; t+=r; document.getElementById('amt'+i).textContent=r>0?fmt(r):''; });
+  document.getElementById('subtotalCell').textContent=fmt(t);
+  document.getElementById('totalCell').textContent=fmt(t);
+  document.getElementById('balanceCell').textContent=fmt(t);
+  return t;
+}
+function gv(id){ return document.getElementById(id).value.trim(); }
+function getTotal(){ var t=0; [1,2,3].forEach(function(i){ t+=parseFloat(document.getElementById('rate'+i).value)||0; }); return t; }
+
+// ================================================================
+// VALIDATION
+// ================================================================
+var REQUIRED=[{id:'btName',label:'Bill To: Company Name'},{id:'frName',label:'From: Company'},{id:'toName',label:'To: Company'},{id:'tripNum',label:'Trip #'},{id:'poNum',label:'PO Number'},{id:'sealNum',label:'Seal Number'},{id:'trailer',label:'Trailer'},{id:'act1',label:'Activity (row 1)'},{id:'rate1',label:'Rate (row 1)'}];
+function validateForm(){
+  var missing=[];
+  REQUIRED.forEach(function(f){ var el=document.getElementById(f.id); if(!el.value.trim()){ el.classList.add('req-error'); missing.push(f.label); } else el.classList.remove('req-error'); });
+  var r1=parseFloat(gv('rate1')); if(r1<=0||isNaN(r1)){ document.getElementById('rate1').classList.add('req-error'); if(!missing.includes('Rate (row 1)')) missing.push('Rate (row 1) must be > 0'); }
+  return missing;
+}
+
+// ================================================================
+// COLLECT DATA — FIX: saves individual address fields
+// ================================================================
+function collectData(){
+  return {
+    invNum:gv('invNum'), date:gv('invDate'), tripNum:gv('tripNum'),
+    poNum:gv('poNum'), sealNum:gv('sealNum'), pickups:gv('pickups'), drops:gv('drops'), trailer:gv('trailer'),
+    billTo:gv('btName'), btAddr1:gv('btAddr1'), btAddr2:gv('btAddr2'), btPostal:gv('btPostal'), btPhone:gv('btPhone'), btEmail:gv('btEmail'),
+    from:gv('frName'), frAddr1:gv('frAddr1'), frAddr2:gv('frAddr2'), frPostal:gv('frPostal'), frPhone:gv('frPhone'),
+    to:gv('toName'), toAddr1:gv('toAddr1'), toAddr2:gv('toAddr2'), toPostal:gv('toPostal'), toPhone:gv('toPhone'),
+    act1:gv('act1'), rate1:gv('rate1'),
+    act2:gv('act2'), rate2:gv('rate2'),
+    act3:gv('act3'), rate3:gv('rate3'),
+    remarks:gv('remarks'), total:getTotal(), currency:currentCurrency,
+    pdfPath:'C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\'+(gv('btName')||'Unknown').replace(/[\/:*?"<>|]/g,'_')+'\\TDCarriers_Invoice_'+gv('invNum')+'.pdf'
+  };
+}
+
+// ================================================================
+// SAVE INVOICE
+// ================================================================
+function saveInvoice(){
+  var missing=validateForm();
+  if(missing.length>0){ alert('Please fill in all required fields before saving:\n\n• '+missing.join('\n• ')); return; }
+  var d=collectData(); if(!d.invNum){ alert('Please enter an Invoice Number.'); return; }
+  var idx=savedInvoices.findIndex(function(x){ return x.invNum===d.invNum; });
+  if(idx>=0){ if(!confirm('Invoice #'+d.invNum+' already saved. Overwrite?')) return; savedInvoices[idx]=d; } else savedInvoices.push(d);
+  if(!payments[d.invNum]) payments[d.invNum]={status:'pending',paidAmount:0,history:[]};
+  persistInvoices(); savePayments(); renderDB(); autoExportExcel();
+  showToast('Invoice #'+d.invNum+' saved & Excel updated!');
+}
+
+// ================================================================
+// RENDER DB
+// ================================================================
+function renderDB(){
+  var el=document.getElementById('dbContent');
+  if(savedInvoices.length===0){ el.innerHTML='<p style="color:#888;font-size:12px;padding:8px;">No invoices saved yet.</p>'; return; }
+  var h='<table class="dbt"><tr><th>Inv #</th><th>Date</th><th>Trip #</th><th>Currency</th><th>Bill To</th><th>From</th><th>To</th><th>PO#</th><th>Seal</th><th>Trailer</th><th>Pick</th><th>Drop</th><th>Amount</th><th colspan="2">Actions</th></tr>';
+  // Sort descending by invoice number (most recent on top)
+  var sorted = savedInvoices.slice().sort(function(a,b){
+    return (parseInt(b.invNum)||0) - (parseInt(a.invNum)||0);
+  });
+  sorted.forEach(function(d,i){
+    // find real index in savedInvoices for load/delete
+    i = savedInvoices.indexOf(d);
+    var sym=d.currency==='USD'?'US$':'CA$';
+    h+='<tr><td>'+d.invNum+'</td><td>'+d.date+'</td><td>'+d.tripNum+'</td><td style="text-align:center;font-weight:bold;">'+sym+'</td><td>'+d.billTo+'</td><td>'+d.from+'</td><td>'+d.to+'</td><td>'+d.poNum+'</td><td>'+d.sealNum+'</td><td>'+d.trailer+'</td><td>'+d.pickups+'</td><td>'+d.drops+'</td><td style="text-align:right;font-weight:bold;">'+sym+Number(d.total).toLocaleString('en-CA',{minimumFractionDigits:2})+'</td><td><button onclick="loadInvoice('+i+')" style="font-size:11px;padding:2px 7px;cursor:pointer;background:#1565c0;color:#fff;border:none;border-radius:3px;">Load</button></td><td><button onclick="deleteInvoice('+i+')" style="font-size:11px;padding:2px 7px;cursor:pointer;background:#b71c1c;color:#fff;border:none;border-radius:3px;">Del</button></td></tr>';
+  });
+  h+='</table>'; el.innerHTML=h;
+}
+
+function deleteInvoice(i){ if(!confirm('Delete Invoice #'+savedInvoices[i].invNum+'?')) return; savedInvoices.splice(i,1); persistInvoices(); renderDB(); autoExportExcel(); showToast('Invoice deleted.'); }
+function clearAllInvoices(){ if(!confirm('Clear ALL saved invoices? This cannot be undone.')) return; savedInvoices=[]; persistInvoices(); renderDB(); showToast('All invoices cleared.'); }
+function toggleDB(){ var p=document.getElementById('dbpanel'); p.style.display=p.style.display==='none'?'block':'none'; renderDB(); }
+
+// ================================================================
+// LOAD INVOICE
+// ================================================================
+function findInDB(db, name) {
+  if (!name) return null;
+  var n = name.trim().toLowerCase();
+  for (var i = 0; i < db.length; i++) {
+    if (db[i].name.trim().toLowerCase() === n) return db[i];
+  }
+  return null;
+}
+
+function loadInvoice(i){
+  var d = savedInvoices[i];
+
+  // ── Core fields ──
+  document.getElementById('invNum').value   = d.invNum;
+  document.getElementById('invDate').value  = d.date;
+  document.getElementById('tripNum').value  = d.tripNum;
+  document.getElementById('poNum').value    = d.poNum;
+  document.getElementById('sealNum').value  = d.sealNum;
+  document.getElementById('pickups').value  = d.pickups  || '';
+  document.getElementById('drops').value    = d.drops    || '';
+  document.getElementById('trailer').value  = d.trailer  || '';
+  document.getElementById('remarks').value  = d.remarks  || '';
+
+  // ── Bill To — use saved data; if address empty, auto-fill from DB ──
+  document.getElementById('btName').value   = d.billTo   || '';
+  if (d.btAddr1) {
+    document.getElementById('btAddr1').value  = d.btAddr1;
+    document.getElementById('btAddr2').value  = d.btAddr2  || '';
+    document.getElementById('btPostal').value = d.btPostal || '';
+    document.getElementById('btPhone').value  = d.btPhone  || '';
+    document.getElementById('btEmail').value  = d.btEmail  || '';
+  } else {
+    var btCo = findInDB(billToDB, d.billTo);
+    document.getElementById('btAddr1').value  = btCo ? btCo.a1 : '';
+    document.getElementById('btAddr2').value  = btCo ? btCo.a2 : '';
+    document.getElementById('btPostal').value = btCo ? btCo.a3 : '';
+    document.getElementById('btPhone').value  = btCo ? btCo.ph : '';
+    document.getElementById('btEmail').value  = btCo ? btCo.em : '';
+  }
+
+  // ── From — use saved data; if address empty, auto-fill from DB ──
+  document.getElementById('frName').value   = d.from || '';
+  if (d.frAddr1) {
+    document.getElementById('frAddr1').value  = d.frAddr1;
+    document.getElementById('frAddr2').value  = d.frAddr2  || '';
+    document.getElementById('frPostal').value = d.frPostal || '';
+    document.getElementById('frPhone').value  = d.frPhone  || '';
+  } else {
+    var frCo = findInDB(fromToDB, d.from);
+    document.getElementById('frAddr1').value  = frCo ? frCo.a1 : '';
+    document.getElementById('frAddr2').value  = frCo ? frCo.a2 : '';
+    document.getElementById('frPostal').value = frCo ? frCo.a3 : '';
+    document.getElementById('frPhone').value  = frCo ? frCo.ph : '';
+  }
+
+  // ── To — use saved data; if address empty, auto-fill from DB ──
+  document.getElementById('toName').value   = d.to || '';
+  if (d.toAddr1) {
+    document.getElementById('toAddr1').value  = d.toAddr1;
+    document.getElementById('toAddr2').value  = d.toAddr2  || '';
+    document.getElementById('toPostal').value = d.toPostal || '';
+    document.getElementById('toPhone').value  = d.toPhone  || '';
+  } else {
+    var toCo = findInDB(fromToDB, d.to);
+    document.getElementById('toAddr1').value  = toCo ? toCo.a1 : '';
+    document.getElementById('toAddr2').value  = toCo ? toCo.a2 : '';
+    document.getElementById('toPostal').value = toCo ? toCo.a3 : '';
+    document.getElementById('toPhone').value  = toCo ? toCo.ph : '';
+  }
+
+  // ── Activities ──
+  document.getElementById('act1').value  = d.act1  || '';
+  document.getElementById('rate1').value = d.rate1 || '';
+  document.getElementById('act2').value  = d.act2  || '';
+  document.getElementById('rate2').value = d.rate2 || '';
+  document.getElementById('act3').value  = d.act3  || '';
+  document.getElementById('rate3').value = d.rate3 || '';
+
+  setCurrency(d.currency || 'CDN');
+  REQUIRED.forEach(function(f){ document.getElementById(f.id).classList.remove('req-error'); });
+  calc();
+  document.getElementById('dbpanel').style.display = 'none';
+  window.scrollTo(0, 0);
+  showToast('Invoice #' + d.invNum + ' loaded.');
+}
+
+// ================================================================
+// NEW INVOICE
+// ================================================================
+function newInvoice(){
+  if(!confirm('Start a new invoice? Unsaved data will be lost.')) return;
+  // Always start from highest saved invoice number + 1
+  var maxSaved = savedInvoices.reduce(function(m,inv){ var n=parseInt(inv.invNum)||0; return n>m?n:m; }, 0);
+  var curField = parseInt(document.getElementById('invNum').value)||0;
+  var nextNum = Math.max(maxSaved, curField) + 1;
+  document.getElementById('invNum').value=nextNum;
+  document.getElementById('invDate').value=new Date().toISOString().split('T')[0];
+  ['tripNum','poNum','sealNum','pickups','drops','trailer','remarks'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['btName','btAddr1','btAddr2','btPostal','btPhone','btEmail','frName','frAddr1','frAddr2','frPostal','frPhone','toName','toAddr1','toAddr2','toPostal','toPhone'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['selBillTo','selFrom','selTo'].forEach(function(id){ document.getElementById(id).value=''; });
+  [1,2,3].forEach(function(i){ document.getElementById('act'+i).value=''; document.getElementById('rate'+i).value=''; document.getElementById('amt'+i).textContent=''; });
+  REQUIRED.forEach(function(f){ document.getElementById(f.id).classList.remove('req-error'); });
+  calc();
+}
+
+// ================================================================
+// EXCEL — FIX: only uses rate1-3 matching the 3 activity rows
+// ================================================================
+var EXCEL_FILENAME='TDCarriers_Invoices.xlsx';
+function buildWorkbook(){
+  // Sort invoices by invoice number ascending
+  var sorted = savedInvoices.slice().sort(function(a,b){
+    return (parseInt(a.invNum)||0) - (parseInt(b.invNum)||0);
+  });
+
+  var headers=['Invoice No','Trip No','PO Num','From','To','Bill To','Seal','Trailer','Pickups','Drops','Amount','Total','Currency','Save as PDF'];
+  var colWidths=[11,18,18,26,30,26,14,10,8,8,14,14,10,65];
+
+  var rows = sorted.map(function(d){
+    var amt=(parseFloat(d.rate1)||0)+(parseFloat(d.rate2)||0)+(parseFloat(d.rate3)||0);
+    return [
+      parseInt(d.invNum)||d.invNum,
+      d.tripNum, d.poNum,
+      d.from, d.to, d.billTo,
+      d.sealNum, d.trailer, d.pickups||'', d.drops||'',
+      amt, d.total, d.currency||'CDN',
+      d.pdfPath||''
+    ];
+  });
+
+  var ws = XLSX.utils.aoa_to_sheet([headers].concat(rows));
+  ws['!cols'] = colWidths.map(function(w){ return {wch:w}; });
+
+  // Format amount + total columns
+  [10,11].forEach(function(col){
+    for(var r=1;r<=rows.length;r++){
+      var addr=XLSX.utils.encode_cell({r:r,c:col});
+      if(ws[addr]) ws[addr].z='#,##0.00';
+    }
+  });
+
+  // Make pdfPath column (col 13) a clickable hyperlink
+  for(var r=1;r<=rows.length;r++){
+    var addr=XLSX.utils.encode_cell({r:r,c:13});
+    if(ws[addr] && ws[addr].v){
+      var path = ws[addr].v;
+      ws[addr].l = { Target: path, tooltip: 'Open PDF: '+path };
+      ws[addr].v = path;
+    }
+  }
+
+  // Freeze top row
+  ws['!freeze'] = {xSplit:0, ySplit:1, topLeftCell:'A2', activePane:'bottomLeft'};
+
+  // Summary sheet
+  var totCDN=sorted.filter(function(d){ return (d.currency||'CDN')==='CDN'; }).reduce(function(s,d){ return s+(d.total||0); },0);
+  var totUSD=sorted.filter(function(d){ return d.currency==='USD'; }).reduce(function(s,d){ return s+(d.total||0); },0);
+  var ws2=XLSX.utils.aoa_to_sheet([
+    ['T&D Carriers LTD - Invoice Summary'],
+    ['Generated:',new Date().toLocaleDateString('en-CA')],
+    ['Total Invoices:',sorted.length],
+    ['Total $CDN:',totCDN],
+    ['Total $USD:',totUSD],
+    [''],
+    ['TIP: Click any path in the Save as PDF column to open the PDF file directly.']
+  ]);
+  ws2['!cols']=[{wch:22},{wch:50}];
+
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Invoices');
+  XLSX.utils.book_append_sheet(wb,ws2,'Summary');
+  return wb;
+}
+
+function autoExportExcel(){ if(savedInvoices.length===0) return; try{ XLSX.writeFile(buildWorkbook(),EXCEL_FILENAME); }catch(e){ console.warn('Excel:',e); } }
+function exportExcel(){ if(savedInvoices.length===0){ alert('No saved invoices to export.'); return; } XLSX.writeFile(buildWorkbook(),EXCEL_FILENAME); showToast('Excel exported!'); }
+function exportPDF(){ window.print(); }
+
+// ================================================================
+// PAYMENT TRACKER
+// ================================================================
+function getPayment(invNum){ return payments[String(invNum)]||{status:'pending',paidAmount:0,history:[]}; }
+
+function syncTracker(){
+  savedInvoices=JSON.parse(localStorage.getItem('td_invoices')||'[]');
+  savedInvoices.forEach(function(inv){ if(!payments[String(inv.invNum)]) payments[String(inv.invNum)]={status:'pending',paidAmount:0,history:[]}; });
+  savePayments();
+  // Auto-update invoice number field to max+1
+  if(savedInvoices.length>0){
+    var maxN=savedInvoices.reduce(function(m,inv){ var n=parseInt(inv.invNum)||0; return n>m?n:m; },0);
+    var curField=parseInt(document.getElementById('invNum').value)||0;
+    if(maxN>=curField) document.getElementById('invNum').value=maxN+1;
+  }
+  renderPayList(); renderSummaryBar();
+  showToast('Synced — '+savedInvoices.length+' invoices. Next Invoice #'+document.getElementById('invNum').value);
+}
+
+function renderSummaryBar(){
+  var paid=0,pending=0,partial=0;
+  savedInvoices.forEach(function(inv){ var s=getPayment(inv.invNum).status; if(s==='paid') paid++; else if(s==='partial') partial++; else pending++; });
+  document.getElementById('sumPaid').textContent=paid;
+  document.getElementById('sumPending').textContent=pending;
+  document.getElementById('sumPartial').textContent=partial;
+  document.getElementById('sumTotal').textContent=savedInvoices.length;
+}
+
+function showTPage(name){
+  document.querySelectorAll('.tpage').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('tpage-'+name).classList.add('active');
+  if(name==='reports') renderReports();
+}
+
+function renderPayList(){
+  var el=document.getElementById('payList');
+  var filtered=savedInvoices.filter(function(inv){ return currentFilter==='all'||getPayment(inv.invNum).status===currentFilter; });
+  if(filtered.length===0){ el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa;"><div style="font-size:40px;">📄</div><p>No invoices in this category.</p></div>'; return; }
+  var order={pending:0,partial:1,paid:2};
+  filtered.sort(function(a,b){
+    // Primary: status (pending first, then partial, then paid)
+    var sd = (order[getPayment(a.invNum).status]||0) - (order[getPayment(b.invNum).status]||0);
+    if(sd !== 0) return sd;
+    // Secondary: invoice number descending (newest first within same status)
+    return (parseInt(b.invNum)||0) - (parseInt(a.invNum)||0);
+  });
+  var h='';
+  filtered.forEach(function(inv){
+    var p=getPayment(inv.invNum); var status=p.status||'pending';
+    var paidAmt=p.paidAmount||0; var balance=inv.total-paidAmt;
+    var badge=status==='paid'?'<span class="sbadge paid">✓ Paid</span>':status==='partial'?'<span class="sbadge partial">◑ Partial</span>':'<span class="sbadge pending">⚠ Pending</span>';
+    var amtInfo=status==='paid'?'<div class="paid-lbl">✓ Fully Paid</div>':status==='partial'?'<div class="partial-lbl">Paid: '+fmtC(paidAmt,inv.currency)+'</div><div class="owed-lbl">Owed: '+fmtC(balance,inv.currency)+'</div>':'<div class="owed-lbl">Unpaid: '+fmtC(inv.total,inv.currency)+'</div>';
+    h+='<div class="pay-card '+status+'">'
+      +'<div class="pay-card-hdr"><div><span class="pay-invno">#'+inv.invNum+'</span> <span class="pay-invdate">'+inv.date+'</span></div>'+badge+'</div>'
+      +'<div class="pay-card-body">'
+      +'<div class="prow"><span class="pk">Bill To</span><span class="pv">'+inv.billTo+'</span></div>'
+      +'<div class="prow"><span class="pk">From</span><span class="pv">'+inv.from+'</span></div>'
+      +'<div class="prow"><span class="pk">To</span><span class="pv">'+inv.to+'</span></div>'
+      +'<div class="prow"><span class="pk">Trip # / PO</span><span class="pv">'+inv.tripNum+' / '+inv.poNum+'</span></div>'
+      +'<div class="amt-section"><div><div style="font-size:10px;color:#888;margin-bottom:2px;">Invoice Total</div><div class="pay-total">'+fmtC(inv.total,inv.currency)+'</div></div><div style="text-align:right;">'+amtInfo+'</div></div>'
+      +'</div>'
+      +'<div class="pay-card-footer">'
+      +'<button class="pbtn-paid" data-fn="paid" data-inv="'+inv.invNum+'">✓ Paid</button>'
+      +'<button class="pbtn-partial" data-fn="toggle-partial" data-inv="'+inv.invNum+'">◑ Partial</button>'
+      +'<button class="pbtn-pending" data-fn="pending" data-inv="'+inv.invNum+'">⚠ Pending</button>'
+      +'<button class="pbtn-detail" data-fn="detail" data-inv="'+inv.invNum+'">📄 Detail</button>'
+      +'</div>'
+      +'<div class="partial-form" id="pf-'+inv.invNum+'">'
+      +'<div style="font-size:11px;font-weight:700;color:#e65100;text-transform:uppercase;margin-bottom:4px;">Enter Payment Amount</div>'
+      +'<div class="pf-row"><input type="number" id="pa-'+inv.invNum+'" placeholder="Amount" inputmode="decimal"><input type="text" id="pn-'+inv.invNum+'" placeholder="Note (optional)"><button class="pf-apply" data-fn="apply" data-inv="'+inv.invNum+'">Apply</button></div>'
+      +'<div style="font-size:11px;color:#e65100;margin-top:4px;">Adds to any previous payments recorded.</div>'
+      +'</div>'
+      +'</div>';
+  });
+  el.innerHTML=h;
+  el.addEventListener('click',function(e){
+    var btn=e.target.closest('button[data-fn]'); if(!btn) return;
+    var fn=btn.getAttribute('data-fn'); var invNum=btn.getAttribute('data-inv');
+    if(fn==='paid') markPaid(invNum);
+    else if(fn==='toggle-partial') togglePF(invNum);
+    else if(fn==='pending') markPending(invNum);
+    else if(fn==='detail') openDetail(invNum);
+    else if(fn==='apply') applyPartial(invNum);
+  });
+}
+
+function markPaid(invNum){
+  var inv=savedInvoices.find(function(i){ return String(i.invNum)===String(invNum); }); if(!inv) return;
+  var p=getPayment(invNum); p.status='paid'; p.paidAmount=inv.total;
+  p.history.push({date:new Date().toISOString().split('T')[0],amount:inv.total,note:'Marked fully paid'});
+  payments[String(invNum)]=p; savePayments(); renderPayList(); renderSummaryBar();
+  showToast('Invoice #'+invNum+' marked as PAID.');
+}
+function markPending(invNum){
+  var p=getPayment(invNum); p.status='pending'; p.paidAmount=0; p.history=[];
+  payments[String(invNum)]=p; savePayments(); renderPayList(); renderSummaryBar();
+  showToast('Invoice #'+invNum+' set to PENDING.');
+}
+function togglePF(invNum){ var f=document.getElementById('pf-'+invNum); if(f){ f.classList.toggle('show'); if(f.classList.contains('show')){ var inp=document.getElementById('pa-'+invNum); if(inp) inp.focus(); } } }
+function applyPartial(invNum){
+  var inv=savedInvoices.find(function(i){ return String(i.invNum)===String(invNum); }); if(!inv) return;
+  var amt=parseFloat((document.getElementById('pa-'+invNum)||{}).value)||0;
+  var note=((document.getElementById('pn-'+invNum)||{}).value||'').trim();
+  if(amt<=0){ showToast('Enter a valid amount.'); return; }
+  var p=getPayment(invNum); p.paidAmount=(p.paidAmount||0)+amt;
+  if(p.paidAmount>=inv.total){ p.paidAmount=inv.total; p.status='paid'; } else p.status='partial';
+  p.history.push({date:new Date().toISOString().split('T')[0],amount:amt,note:note||'Partial payment'});
+  payments[String(invNum)]=p; savePayments(); renderPayList(); renderSummaryBar();
+  showToast('Payment of '+fmtC(amt,inv.currency)+' recorded.');
+}
+
+// ================================================================
+// DETAIL MODAL
+// ================================================================
+function openDetail(invNum){
+  var inv=savedInvoices.find(function(i){ return String(i.invNum)===String(invNum); }); if(!inv) return;
+  var p=getPayment(invNum); currentDetailInv=invNum;
+  var paidAmt=p.paidAmount||0; var balance=inv.total-paidAmt;
+  document.getElementById('detailTitle').textContent='Invoice #'+invNum+' — '+inv.billTo;
+  var h='<div class="dsec">Invoice Details</div>';
+  [[inv.billTo,'Bill To'],[inv.from,'From'],[inv.to,'To'],[inv.tripNum,'Trip #'],[inv.poNum,'PO Number'],[inv.sealNum,'Seal'],[inv.trailer,'Trailer'],[inv.date,'Date'],[inv.currency||'CDN','Currency'],[fmtC(inv.total,inv.currency),'Invoice Total']].forEach(function(f){ if(f[0]) h+='<div class="drow"><span class="dk">'+f[1]+'</span><span class="dv">'+f[0]+'</span></div>'; });
+  if(inv.act1) h+='<div class="dsec">Activities</div><div class="drow"><span class="dk">'+inv.act1+'</span><span class="dv">'+fmtC(inv.rate1,inv.currency)+'</span></div>';
+  if(inv.act2) h+='<div class="drow"><span class="dk">'+inv.act2+'</span><span class="dv">'+fmtC(inv.rate2,inv.currency)+'</span></div>';
+  if(inv.act3) h+='<div class="drow"><span class="dk">'+inv.act3+'</span><span class="dv">'+fmtC(inv.rate3,inv.currency)+'</span></div>';
+  h+='<div class="dsec">Payment Status</div>';
+  h+='<div class="drow"><span class="dk">Status</span><span class="dv" style="text-transform:uppercase;font-weight:900;">'+p.status+'</span></div>';
+  h+='<div class="drow"><span class="dk">Total Paid</span><span class="dv" style="color:#2e7d32;">'+fmtC(paidAmt,inv.currency)+'</span></div>';
+  if(balance>0) h+='<div class="drow"><span class="dk">Balance Owed</span><span class="dv" style="color:#b71c1c;">'+fmtC(balance,inv.currency)+'</span></div>';
+  if(p.history&&p.history.length>0){
+    h+='<div class="dsec">Payment History</div>';
+    p.history.forEach(function(ph,i){ h+='<div class="ph-item"><button class="ph-del" data-fn="delpay" data-inv="'+invNum+'" data-idx="'+i+'">✕</button><div class="ph-date">'+ph.date+'</div><div class="ph-amt">'+fmtC(ph.amount,inv.currency)+'</div>'+(ph.note?'<div class="ph-note">'+ph.note+'</div>':'')+'</div>'; });
+  }
+  h+='<div class="dsec">Record Payment</div><div class="add-pay-box"><label>Amount Received</label><input type="number" id="modal-amt" placeholder="0.00" inputmode="decimal"><label>Note (optional)</label><textarea id="modal-note" placeholder="e.g. Cheque #1234, EFT, Cash..."></textarea><button class="add-pay-btn" onclick="addPayModal()">✔ Record Payment</button></div>';
+  document.getElementById('detailBody').innerHTML=h;
+  document.getElementById('detailBody').onclick=function(e){
+    var btn=e.target.closest('button[data-fn]'); if(!btn) return;
+    if(btn.getAttribute('data-fn')==='delpay') deletePayRecord(btn.getAttribute('data-inv'),parseInt(btn.getAttribute('data-idx')));
+  };
+  document.getElementById('detailModal').classList.add('show');
+}
+function closeDetail(){ document.getElementById('detailModal').classList.remove('show'); currentDetailInv=null; }
+document.getElementById('detailModal').addEventListener('click',function(e){ if(e.target===this) closeDetail(); });
+
+function addPayModal(){
+  if(!currentDetailInv) return;
+  var inv=savedInvoices.find(function(i){ return String(i.invNum)===String(currentDetailInv); }); if(!inv) return;
+  var amt=parseFloat(document.getElementById('modal-amt').value)||0; if(amt<=0){ showToast('Enter valid amount.'); return; }
+  var note=document.getElementById('modal-note').value.trim();
+  var p=getPayment(currentDetailInv); p.paidAmount=(p.paidAmount||0)+amt;
+  if(p.paidAmount>=inv.total){ p.paidAmount=inv.total; p.status='paid'; } else p.status='partial';
+  p.history.push({date:new Date().toISOString().split('T')[0],amount:amt,note:note||'Payment received'});
+  payments[String(currentDetailInv)]=p; savePayments(); renderPayList(); renderSummaryBar();
+  openDetail(currentDetailInv); showToast('Payment of '+fmtC(amt,inv.currency)+' recorded!');
+}
+function deletePayRecord(invNum,idx){
+  if(!confirm('Remove this payment record?')) return;
+  var inv=savedInvoices.find(function(i){ return String(i.invNum)===String(invNum); });
+  var p=getPayment(invNum); p.history.splice(idx,1);
+  p.paidAmount=p.history.reduce(function(s,ph){ return s+(parseFloat(ph.amount)||0); },0);
+  if(p.paidAmount<=0) p.status='pending'; else if(inv&&p.paidAmount>=inv.total) p.status='paid'; else p.status='partial';
+  payments[String(invNum)]=p; savePayments(); renderPayList(); renderSummaryBar(); openDetail(invNum);
+  showToast('Payment record removed.');
+}
+
+// ================================================================
+// REPORTS
+// ================================================================
+function renderReports(){
+  var el=document.getElementById('reportsContent');
+  if(savedInvoices.length===0){ el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa;"><div style="font-size:40px;">📊</div><p>No data yet.</p></div>'; return; }
+  var paid=0,pending=0,partial=0,paidCDN=0,paidUSD=0,pendingCDN=0,pendingUSD=0,partialCollected=0,partialOwed=0;
+  savedInvoices.forEach(function(inv){
+    var p=getPayment(inv.invNum); var s=p.status||'pending'; var isCDN=(inv.currency||'CDN')==='CDN';
+    if(s==='paid'){ paid++; if(isCDN) paidCDN+=inv.total; else paidUSD+=inv.total; }
+    else if(s==='partial'){ partial++; partialCollected+=(p.paidAmount||0); partialOwed+=inv.total-(p.paidAmount||0); }
+    else{ pending++; if(isCDN) pendingCDN+=inv.total; else pendingUSD+=inv.total; }
+  });
+  var pendingInvs=savedInvoices.filter(function(i){ return getPayment(i.invNum).status==='pending'; });
+  var h='';
+  h+='<div class="rcard"><div class="rcard-hdr">📊 Overview</div><div class="rcard-body"><div class="rrow"><span class="rk">Total Invoices</span><span class="rv">'+savedInvoices.length+'</span></div><div class="rrow"><span class="rk">Paid</span><span class="rv rv-g">'+paid+'</span></div><div class="rrow"><span class="rk">Partial</span><span class="rv rv-o">'+partial+'</span></div><div class="rrow"><span class="rk">Pending</span><span class="rv rv-r">'+pending+'</span></div></div></div>';
+  h+='<div class="rcard"><div class="rcard-hdr rg">✓ Paid</div><div class="rcard-body">'+(paidCDN>0?'<div class="rrow"><span class="rk">CA$ Collected</span><span class="rv rv-g">CA$'+paidCDN.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>':'')+(paidUSD>0?'<div class="rrow"><span class="rk">US$ Collected</span><span class="rv rv-g">US$'+paidUSD.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>':'')+'</div></div>';
+  if(partial>0) h+='<div class="rcard"><div class="rcard-hdr ro">◑ Partially Paid</div><div class="rcard-body"><div class="rrow"><span class="rk">Count</span><span class="rv rv-o">'+partial+'</span></div><div class="rrow"><span class="rk">Collected So Far</span><span class="rv rv-o">CA$'+partialCollected.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div><div class="rrow"><span class="rk">Still Owed</span><span class="rv rv-r">CA$'+partialOwed.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div></div></div>';
+  if(pending>0){
+    h+='<div class="rcard"><div class="rcard-hdr rr">⚠ Pending (Unpaid)</div><div class="rcard-body">'+(pendingCDN>0?'<div class="rrow"><span class="rk">CA$ Outstanding</span><span class="rv rv-r">CA$'+pendingCDN.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>':'')+(pendingUSD>0?'<div class="rrow"><span class="rk">US$ Outstanding</span><span class="rv rv-r">US$'+pendingUSD.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>':'');
+    pendingInvs.forEach(function(inv){ h+='<div class="rrow"><span class="rk">#'+inv.invNum+' — '+inv.billTo+'</span><span class="rv rv-r">'+fmtC(inv.total,inv.currency)+'</span></div>'; });
+    h+='</div></div>';
+  }
+  el.innerHTML=h;
+}
+
+// ================================================================
+// FILTER TABS
+// ================================================================
+document.querySelector('.filter-tabs').addEventListener('click',function(e){
+  var tab=e.target.closest('.ftab'); if(!tab) return;
+  document.querySelectorAll('.ftab').forEach(function(t){ t.classList.remove('active'); });
+  tab.classList.add('active');
+  currentFilter=tab.getAttribute('data-filter');
+  renderPayList();
+});
+
+// ================================================================
+// TOAST
+// ================================================================
+var _tt;
+function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(function(){ t.classList.remove('show'); },2800); }
+
+// ================================================================
+// INIT
+// ================================================================
+(function init(){
+  // ── PRELOAD INVOICES (runs only once on first open) ──────────────
+  var PRELOAD_INVOICES = [{"invNum": "1120", "date": "2025-01-01", "tripNum": "1193361", "poNum": "T034547", "sealNum": "744762", "pickups": "1", "drops": "1", "trailer": "1801", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "MultiMatic Inmet", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KW Chilli c/o MJM -KC44", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1300.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1120.pdf"}, {"invNum": "1121", "date": "2025-01-01", "tripNum": "1195076", "poNum": "T034592", "sealNum": "26837104", "pickups": "1", "drops": "1", "trailer": "1801", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "Chalmers Suspensions Int.Inc", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KW Chilli c/o MJM -KC44", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1300.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1121.pdf"}, {"invNum": "1122", "date": "2025-01-01", "tripNum": "1195126", "poNum": "T034597", "sealNum": "UL-6901894", "pickups": "1", "drops": "1", "trailer": "1801", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "Orbis", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "DBG Canada Ltd.", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1250.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1122.pdf"}, {"invNum": "1123", "date": "2025-01-01", "tripNum": "1195080", "poNum": "T034596", "sealNum": "UL-8172471", "pickups": "1", "drops": "1", "trailer": "1801", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "DBG Canada Ltd.", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KW CHILLI C/O RIFFLE BLDG 1 KC06", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1300.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1123.pdf"}, {"invNum": "1124", "date": "2025-01-01", "tripNum": "1196638", "poNum": "T034629", "sealNum": "375361", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "AMINO NORTH AMERICA", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KENWORTH CHILLICOTHE KC00", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1450.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1124.pdf"}, {"invNum": "1126", "date": "2025-01-01", "tripNum": "1196426", "poNum": "T034624", "sealNum": "UL-6901907", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "Orbis", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "MultiMatic Inmet", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1250.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1126.pdf"}, {"invNum": "1127", "date": "2025-01-01", "tripNum": "1196227", "poNum": "T034609", "sealNum": "744672", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "MultiMatic Inmet", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KW Chilli c/o MJM -KC44", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1350.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1127.pdf"}, {"invNum": "1128", "date": "2025-01-01", "tripNum": "1197236", "poNum": "T034639", "sealNum": "UL-6901912", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "Orbis", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "MultiMatic Inmet", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1250.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1128.pdf"}, {"invNum": "1129", "date": "2025-01-01", "tripNum": "1197268", "poNum": "T034634", "sealNum": "744654", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "MultiMatic Inmet", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KW Chilli c/o MJM -KC44", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1300.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1129.pdf"}, {"invNum": "1130", "date": "2025-01-01", "tripNum": "1198009", "poNum": "T034651", "sealNum": "UL-6901917", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "Orbis", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "MultiMatic Inmet", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1250.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1130.pdf"}, {"invNum": "1131", "date": "2025-01-01", "tripNum": "1197267", "poNum": "T034633", "sealNum": "744654", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "MultiMatic Inmet", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KW Chilli c/o MJM -KC44", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1300.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1131.pdf"}, {"invNum": "1132", "date": "2025-01-01", "tripNum": "1198583", "poNum": "T034668", "sealNum": "no seal", "pickups": "1", "drops": "1", "trailer": "1801", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "Chalmers Suspensions Int.Inc", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KW Chilli c/o MJM -KC44", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1350.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1132.pdf"}, {"invNum": "1133", "date": "2025-01-01", "tripNum": "1198577", "poNum": "T034673", "sealNum": "UL-6901925", "pickups": "1", "drops": "1", "trailer": "1801", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "Orbis", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "MultiMatic Inmet", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1250.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1133.pdf"}, {"invNum": "1134", "date": "2025-01-01", "tripNum": "1198579", "poNum": "T034661", "sealNum": "698066", "pickups": "1", "drops": "1", "trailer": "1801", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "MultiMatic Inmet", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KW Chilli c/o MJM -KC44", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1350.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1134.pdf"}, {"invNum": "1135", "date": "2025-01-01", "tripNum": "1198581", "poNum": "T034663", "sealNum": "698051", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "MultiMatic Inmet", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KW Chilli c/o MJM -KC44", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1350.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1135.pdf"}, {"invNum": "1136", "date": "2025-01-01", "tripNum": "1198841", "poNum": "T034683", "sealNum": "UL-6901930", "pickups": "1", "drops": "1", "trailer": "1801", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "Orbis", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "DBG Canada Ltd.", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1250.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1136.pdf"}, {"invNum": "1137", "date": "2025-01-01", "tripNum": "1200219", "poNum": "T034716", "sealNum": "UL8172652", "pickups": "1", "drops": "1", "trailer": "1801", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "DBG Canada Ltd.", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KW CHILLI C/O RIFFLE BLDG 1 KC06", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1350.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1137.pdf"}, {"invNum": "1138", "date": "2025-01-01", "tripNum": "1199705", "poNum": "T034701", "sealNum": "UL 6901936", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "Orbis", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "MultiMatic Inmet", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1250.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1138.pdf"}, {"invNum": "1139", "date": "2025-01-01", "tripNum": "1200015", "poNum": "T034707", "sealNum": "690021", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "MultiMatic Inmet", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KW Chilli c/o MJM -KC44", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1350.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1139.pdf"}, {"invNum": "1140", "date": "2025-01-01", "tripNum": "C008046", "poNum": "C008046", "sealNum": "NO SEAL", "pickups": "1", "drops": "1", "trailer": "1801", "billTo": "Klare Logistics Inc.", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "GOODWILL INDUSTRIES", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "BASSI TRADE CO. LTD.", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1450.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Klare Logistics Inc.\\TDCarriers_Invoice_1140.pdf"}, {"invNum": "1141", "date": "2025-01-01", "tripNum": "1200814", "poNum": "T034732", "sealNum": "UL 6901943", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "Orbis", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "MultiMatic Inmet", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1250.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1141.pdf"}, {"invNum": "1142", "date": "2025-01-01", "tripNum": "OB/1200017", "poNum": "T034709 / 6105923259", "sealNum": "698019", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "MultiMatic Inmet", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KW Chilli c/o MJM -KC44", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1350.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1142.pdf"}, {"invNum": "1143", "date": "2025-01-01", "tripNum": "IB/1201796", "poNum": "T034751", "sealNum": "UL-6901948", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "Orbis", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "DBG Canada Ltd.", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1250.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1143.pdf"}, {"invNum": "1144", "date": "2025-01-01", "tripNum": "OB/1201184", "poNum": "T034728", "sealNum": "667247", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "MultiMatic Inmet", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "KW Chilli c/o MJM -KC44", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1350.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1144.pdf"}, {"invNum": "1145", "date": "2025-01-01", "tripNum": "IB/1202597", "poNum": "T034773", "sealNum": "UL 6901955", "pickups": "1", "drops": "1", "trailer": "1804", "billTo": "Accord Transportation Ltd", "btAddr1": "", "btAddr2": "", "btPostal": "", "btPhone": "", "btEmail": "", "from": "Orbis", "frAddr1": "", "frAddr2": "", "frPostal": "", "frPhone": "", "to": "MultiMatic Inmet", "toAddr1": "", "toAddr2": "", "toPostal": "", "toPhone": "", "act1": "", "rate1": "", "act2": "", "rate2": "", "act3": "", "rate3": "", "remarks": "", "total": 1250.0, "currency": "CDN", "pdfPath": "C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\Accord Transportation Ltd\\TDCarriers_Invoice_1145.pdf"}];
+
+    var existing = JSON.parse(localStorage.getItem('td_invoices')||'[]');
+  var existingMap = {};
+  existing.forEach(function(inv,i){ existingMap[String(inv.invNum)]=i; });
+
+  var added = 0, corrected = 0;
+  PRELOAD_INVOICES.forEach(function(inv){
+    var key = String(inv.invNum);
+    if(existingMap[key] === undefined){
+      existing.push(inv);
+      existingMap[key] = existing.length - 1;
+      added++;
+    } else {
+      // Always correct tripNum/poNum for 1120-1141 (they were swapped in old data)
+      // Never overwrite act1/rate1 or any user-entered fields
+      var ex = existing[existingMap[key]];
+      var num = parseInt(inv.invNum)||0;
+      if(num >= 1120 && num <= 1141){
+        if(ex.tripNum !== inv.tripNum || ex.poNum !== inv.poNum){
+          ex.tripNum = inv.tripNum;
+          ex.poNum   = inv.poNum;
+          corrected++;
+        }
+      }
+    }
+  });
+  localStorage.setItem('td_invoices', JSON.stringify(existing));
+  savedInvoices = existing;
+  if(added > 0 || corrected > 0){
+    var msg = [];
+    if(added)     msg.push(added+' invoices added');
+    if(corrected) msg.push(corrected+' invoices corrected');
+    showToast(msg.join(', ')+'!');
+  }
+
+  // ── AUTO-INCREMENT: set invNum to last saved + 1 ─────────────────
+  if(savedInvoices.length > 0){
+    var maxNum = savedInvoices.reduce(function(m,inv){
+      var n = parseInt(inv.invNum)||0; return n > m ? n : m;
+    }, 0);
+    if(maxNum > 0){
+      document.getElementById('invNum').value = maxNum + 1;
+    }
+  }
+
+  setCurrency(currentCurrency);
+  refreshAllSelects();
+  document.getElementById('invDate').value=new Date().toISOString().split('T')[0];
+  calc();
+  document.querySelectorAll('.req-field').forEach(function(el){ el.addEventListener('input',function(){ this.classList.remove('req-error'); }); });
+  syncTracker();
+})();
+</script>
+</body>
+</html>
