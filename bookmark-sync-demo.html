@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookmark Sync Demo - TD Invoices</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .setup-section {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      border-left: 4px solid #667eea;
+    }
+
+    .setup-section h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .input-group input {
+      flex: 1;
+      min-width: 250px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+    }
+
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #38a169;
+    }
+
+    .btn-warning {
+      background: #ed8936;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #dd6b20;
+    }
+
+    .btn-danger {
+      background: #f56565;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #e53e3e;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .section h2 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 20px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      font-family: Arial, sans-serif;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .bookmark-list {
+      display: grid;
+      gap: 15px;
+    }
+
+    .bookmark-item {
+      background: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 15px;
+    }
+
+    .bookmark-info {
+      flex: 1;
+    }
+
+    .bookmark-title {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+      word-break: break-word;
+    }
+
+    .bookmark-url {
+      color: #667eea;
+      font-size: 12px;
+      margin-bottom: 5px;
+      word-break: break-all;
+      cursor: pointer;
+    }
+
+    .bookmark-url:hover {
+      text-decoration: underline;
+    }
+
+    .bookmark-date {
+      color: #999;
+      font-size: 12px;
+    }
+
+    .bookmark-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .status-message {
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .status-success {
+      background: #c6f6d5;
+      color: #22543d;
+      border: 1px solid #9ae6b4;
+    }
+
+    .status-error {
+      background: #fed7d7;
+      color: #742a2a;
+      border: 1px solid #fc8181;
+    }
+
+    .status-info {
+      background: #bee3f8;
+      color: #2c5282;
+      border: 1px solid #90cdf4;
+    }
+
+    .status-warning {
+      background: #feebc8;
+      color: #7c2d12;
+      border: 1px solid #fbd38d;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .instructions {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      padding: 20px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .instructions h3 {
+      color: #d97706;
+      margin-bottom: 10px;
+    }
+
+    .instructions ol {
+      margin-left: 20px;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .instructions li {
+      margin-bottom: 8px;
+    }
+
+    .code-block {
+      background: #1f2937;
+      color: #e5e7eb;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📱💻 Bookmark Sync Demo</h1>
+      <p>Sync your bookmarks across phone, laptop, and GitHub</p>
+    </div>
+
+    <div class="content">
+      <!-- Instructions -->
+      <div class="instructions">
+        <h3>🚀 Getting Started (Step-by-Step)</h3>
+        <ol>
+          <li><strong>Create GitHub Personal Access Token:</strong>
+            <ul style="margin-left: 20px;">
+              <li>Go to <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a></li>
+              <li>Click "Generate new token (classic)"</li>
+              <li>Select scope: <code>repo</code></li>
+              <li>Copy the token</li>
+            </ul>
+          </li>
+          <li><strong>Paste your token below</strong> and click "Set GitHub Token"</li>
+          <li><strong>Add bookmarks</strong> using the form</li>
+          <li><strong>Click "Sync to GitHub"</strong> to save bookmarks to your repo</li>
+          <li><strong>On another device:</strong> Paste the same token and click "Sync from GitHub"</li>
+        </ol>
+      </div>
+
+      <!-- Setup Section -->
+      <div class="setup-section">
+        <h2>⚙️ Setup GitHub Token</h2>
+        <div class="input-group">
+          <input type="password" id="githubToken" placeholder="Paste your GitHub Personal Access Token here">
+          <button class="btn btn-primary" onclick="setGitHubToken()">🔐 Set Token</button>
+        </div>
+        <div id="tokenStatus"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number" id="localCount">0</div>
+          <div class="stat-label">Local Bookmarks</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="syncStatus">❌</div>
+          <div class="stat-label">Sync Status</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="lastSync">--</div>
+          <div class="stat-label">Last Sync</div>
+        </div>
+      </div>
+
+      <!-- Add Bookmark -->
+      <div class="section">
+        <h2>➕ Add New Bookmark</h2>
+        <div class="form-group">
+          <label>Bookmark Title:</label>
+          <input type="text" id="bookmarkTitle" placeholder="e.g., My Invoice App">
+        </div>
+        <div class="form-group">
+          <label>Bookmark URL:</label>
+          <input type="text" id="bookmarkUrl" placeholder="e.g., https://my-app.com/invoices">
+        </div>
+        <div class="form-group">
+          <label>Notes (optional):</label>
+          <textarea id="bookmarkNotes" placeholder="Add any notes about this bookmark..."></textarea>
+        </div>
+        <button class="btn btn-success" onclick="addBookmark()">✅ Add Bookmark</button>
+      </div>
+
+      <!-- Sync Controls -->
+      <div class="section">
+        <h2>🔄 Sync Controls</h2>
+        <div class="button-group">
+          <button class="btn btn-warning" onclick="syncFromGitHub()">
+            <span id="pullSpinner" class="hidden spinner"></span>
+            📥 Pull from GitHub
+          </button>
+          <button class="btn btn-warning" onclick="syncToGitHub()">
+            <span id="pushSpinner" class="hidden spinner"></span>
+            📤 Push to GitHub
+          </button>
+          <button class="btn btn-primary" onclick="fullSync()">
+            <span id="fullSpinner" class="hidden spinner"></span>
+            🔁 Full Sync
+          </button>
+          <button class="btn btn-danger" onclick="clearAllBookmarks()">🗑️ Clear All</button>
+        </div>
+        <div id="syncStatus" style="margin-top: 10px;"></div>
+      </div>
+
+      <!-- Bookmarks List -->
+      <div class="section">
+        <h2>📌 My Bookmarks</h2>
+        <div id="bookmarksList" class="bookmark-list"></div>
+        <div id="emptyMessage" style="text-align: center; color: #999; padding: 40px;">
+          No bookmarks yet. Add one above! 👆
+        </div>
+      </div>
+
+      <!-- Debug Info -->
+      <div class="section">
+        <h2>🐛 Debug Info</h2>
+        <button class="btn btn-small btn-primary" onclick="showDebugInfo()">Show Debug Info</button>
+        <div id="debugInfo" class="code-block hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="sync.js"></script>
+  <script>
+    // ===== UI FUNCTIONS =====
+
+    function setGitHubToken() {
+      const token = document.getElementById('githubToken').value.trim();
+      
+      if (!token) {
+        showStatus('Please paste your GitHub token', 'error');
+        return;
+      }
+
+      bookmarkSync.setToken(token);
+      showStatus('✅ GitHub token set successfully! You can now sync bookmarks.', 'success');
+      document.getElementById('githubToken').value = '';
+      updateStats();
+    }
+
+    async function addBookmark() {
+      const title = document.getElementById('bookmarkTitle').value.trim();
+      const url = document.getElementById('bookmarkUrl').value.trim();
+      const notes = document.getElementById('bookmarkNotes').value.trim();
+
+      if (!title || !url) {
+        showStatus('Please enter both title and URL', 'error');
+        return;
+      }
+
+      try {
+        await bookmarkSync.addBookmark({ title, url, notes });
+        showStatus(`✅ Bookmark "${title}" added locally!`, 'success');
+        
+        // Clear form
+        document.getElementById('bookmarkTitle').value = '';
+        document.getElementById('bookmarkUrl').value = '';
+        document.getElementById('bookmarkNotes').value = '';
+        
+        await displayBookmarks();
+        updateStats();
+      } catch (error) {
+        showStatus(`❌ Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function syncFromGitHub() {
+      const spinner = document.getElementById('pullSpinner');
+      spinner.classList.remove('hidden');
+
+      try {
+        showStatus('📥 Pulling bookmarks from GitHub...', 'info');
+        const bookmarks = await bookmarkSync.pullFromGitHub();
+        showStatus(`✅ Successfully pulled ${bookmarks.length} bookmarks from GitHub!`, 'success');
+        await displayBookmarks();
+        updateStats();
+        updateLastSync();
+      } catch (error) {
+        showStatus(`❌ Error: ${error.message}`, 'error');
+      } finally {
+        spinner.classList.add('hidden');
+      }
+    }
+
+    async function syncToGitHub() {
+      const spinner = document.getElementById('pushSpinner');
+      spinner.classList.remove('hidden');
+
+      if (!bookmarkSync.getToken()) {
+        showStatus('❌ GitHub token not set. Please set it first.', 'error');
+        spinner.classList.add('hidden');
+        return;
+      }
+
+      try {
+        showStatus('📤 Pushing bookmarks to GitHub...', 'info');
+        const bookmarks = await bookmarkSync.pushLocalToGitHub();
+        showStatus(`✅ Successfully pushed ${bookmarks.length} bookmarks to GitHub!`, 'success');
+        updateStats();
+        updateLastSync();
+      } catch (error) {
+        showStatus(`❌ Error: ${error.message}`, 'error');
+      } finally {
+        spinner.classList.add('hidden');
+      }
+    }
+
+    async function fullSync() {
+      const spinner = document.getElementById('fullSpinner');
+      spinner.classList.remove('hidden');
+
+      if (!bookmarkSync.getToken()) {
+        showStatus('❌ GitHub token not set. Please set it first.', 'error');
+        spinner.classList.add('hidden');
+        return;
+      }
+
+      try {
+        showStatus('🔄 Performing full sync...', 'info');
+        const bookmarks = await bookmarkSync.fullSync();
+        showStatus(`✅ Full sync complete! ${bookmarks.length} bookmarks synced.`, 'success');
+        await displayBookmarks();
+        updateStats();
+        updateLastSync();
+      } catch (error) {
+        showStatus(`❌ Error: ${error.message}`, 'error');
+      } finally {
+        spinner.classList.add('hidden');
+      }
+    }
+
+    async function deleteBookmark(id) {
+      if (confirm('Delete this bookmark?')) {
+        try {
+          await bookmarkSync.deleteBookmark(id);
+          showStatus('✅ Bookmark deleted!', 'success');
+          await displayBookmarks();
+          updateStats();
+        } catch (error) {
+          showStatus(`❌ Error: ${error.message}`, 'error');
+        }
+      }
+    }
+
+    async function clearAllBookmarks() {
+      if (confirm('⚠️ Delete ALL bookmarks? This cannot be undone!')) {
+        try {
+          await bookmarkSync.clearLocalBookmarks();
+          showStatus('✅ All bookmarks cleared!', 'success');
+          await displayBookmarks();
+          updateStats();
+        } catch (error) {
+          showStatus(`❌ Error: ${error.message}`, 'error');
+        }
+      }
+    }
+
+    async function displayBookmarks() {
+      try {
+        const bookmarks = await bookmarkSync.getLocalBookmarks();
+        const list = document.getElementById('bookmarksList');
+        const empty = document.getElementById('emptyMessage');
+
+        if (bookmarks.length === 0) {
+          list.innerHTML = '';
+          empty.style.display = 'block';
+          return;
+        }
+
+        empty.style.display = 'none';
+        list.innerHTML = bookmarks.map(b => `
+          <div class="bookmark-item">
+            <div class="bookmark-info">
+              <div class="bookmark-title">${escapeHtml(b.title)}</div>
+              <div class="bookmark-url" onclick="window.open('${escapeHtml(b.url)}', '_blank')">
+                🔗 ${escapeHtml(b.url)}
+              </div>
+              ${b.notes ? `<div style="color: #666; font-size: 12px; margin-top: 5px;">📝 ${escapeHtml(b.notes)}</div>` : ''}
+              <div class="bookmark-date">
+                📅 ${new Date(b.timestamp).toLocaleString()}
+              </div>
+            </div>
+            <div class="bookmark-actions">
+              <button class="btn btn-small btn-danger" onclick="deleteBookmark(${b.id})">🗑️</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error displaying bookmarks:', error);
+      }
+    }
+
+    async function updateStats() {
+      try {
+        const bookmarks = await bookmarkSync.getLocalBookmarks();
+        document.getElementById('localCount').textContent = bookmarks.length;
+        
+        const token = bookmarkSync.getToken();
+        document.getElementById('syncStatus').textContent = token ? '✅' : '❌';
+      } catch (error) {
+        console.error('Error updating stats:', error);
+      }
+    }
+
+    function updateLastSync() {
+      const now = new Date();
+      const time = now.toLocaleTimeString();
+      document.getElementById('lastSync').textContent = time;
+    }
+
+    function showStatus(message, type = 'info') {
+      const syncStatus = document.getElementById('syncStatus');
+      syncStatus.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
+      
+      if (type !== 'error') {
+        setTimeout(() => {
+          syncStatus.innerHTML = '';
+        }, 5000);
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showDebugInfo() {
+      const debugDiv = document.getElementById('debugInfo');
+      if (debugDiv.classList.toggle('hidden')) return;
+
+      const token = bookmarkSync.getToken();
+      const info = {
+        tokenSet: !!token,
+        tokenLength: token ? token.length : 0,
+        repo: 'baldeep92sidhu-dev/td-invoices',
+        filePath: 'bookmarks.json',
+        localStorage: {
+          github_token: !!localStorage.getItem('github_token')
+        },
+        userAgent: navigator.userAgent
+      };
+
+      debugDiv.textContent = JSON.stringify(info, null, 2);
+    }
+
+    // Initialize on page load
+    window.addEventListener('load', () => {
+      displayBookmarks();
+      updateStats();
+    });
+  </script>
+</body>
+</html>
