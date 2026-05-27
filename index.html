@@ -170,6 +170,12 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
   input,select,textarea{border:none!important;background:transparent!important;-webkit-appearance:none;}
   select{color:#000!important;}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
+  /* ── FIX: hide dropdown selects on print so company name only appears once ── */
+  #selBillTo, #selFrom, #selTo { display:none!important; }
+  /* ── Make company name inputs print bold ── */
+  #btName, #frName, #toName { font-weight:900!important; font-size:13px!important; }
+  /* Hide empty inputs on print */
+.invoice input[type=text]:placeholder-shown { display:none !important; }
 }
 </style>
 </head>
@@ -739,7 +745,20 @@ function buildWorkbook(){
 
 function autoExportExcel(){ if(savedInvoices.length===0) return; try{ XLSX.writeFile(buildWorkbook(),EXCEL_FILENAME); }catch(e){ console.warn('Excel:',e); } }
 function exportExcel(){ if(savedInvoices.length===0){ alert('No saved invoices to export.'); return; } XLSX.writeFile(buildWorkbook(),EXCEL_FILENAME); showToast('Excel exported!'); }
-function exportPDF(){ window.print(); }
+function exportPDF(){
+  // Hide empty input rows on print, show them after
+  var inputs = document.querySelectorAll('.invoice input[type=text]');
+  inputs.forEach(function(inp){
+    if(!inp.value.trim()){
+      inp.style.display = 'none';
+    }
+  });
+  window.print();
+  // Restore after print
+  inputs.forEach(function(inp){
+    inp.style.display = '';
+  });
+}
 
 // ================================================================
 // PAYMENT TRACKER
