@@ -150,131 +150,82 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
 .tracker-pages .tpage.active{display:block;}
 
 /* ================================================================
-   MOBILE — touch sensitivity, layout, tap targets
+   TOUCH FIX — applies to all screen sizes, no layout changes
+   ================================================================ */
+button, input, select, textarea, a {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ================================================================
+   MOBILE — only layout tweaks, nothing that breaks invoice table
    ================================================================ */
 @media (max-width: 600px){
   body{ padding:6px; }
 
-  /* Bigger tap targets on all buttons */
-  .btn{ padding:12px 14px; font-size:13px; min-height:44px; }
+  /* Toolbar: wrap into 2 per row */
+  .toolbar{ justify-content:center; gap:6px; }
+  .toolbar .btn{ flex:1 1 44%; max-width:48%; font-size:11px; padding:10px 6px; min-height:44px; }
 
-  /* Toolbar wraps and centers on mobile */
-  .toolbar{
-    justify-content: center;
-    gap: 6px;
-    margin-bottom: 8px;
-  }
-  .toolbar .btn{ flex: 1 1 40%; max-width: 48%; font-size:11px; padding:10px 6px; }
+  /* Tabs taller for easier tap */
+  .app-tab{ min-height:48px; padding:12px 6px; }
 
-  /* App tabs bigger */
-  .app-tab{ padding:13px 6px; font-size:12px; min-height:48px; }
-
-  /* Invoice padding tighter on mobile */
+  /* Invoice slightly tighter */
   .invoice{ padding:10px 8px; }
   .header-top{ padding:0 4px !important; gap:6px !important; }
-  .company-info{ font-size:13px; margin-left:6px; }
-  .company-name{ font-size:16px; }
-  .logo-box{ width:90px; height:75px; margin-right:4px; }
+  .company-info{ font-size:12px; margin-left:4px; line-height:1.5; }
+  .company-name{ font-size:15px; }
+  .logo-box{ width:80px; height:66px; margin-right:4px; }
+  .inv-title{ font-size:20px; }
+  .footer-bar{ font-size:11px; }
 
-  /* Inputs — larger font stops iOS zoom-in on focus */
-  input[type=text],
-  input[type=number],
-  input[type=date],
-  select,
-  textarea{
-    font-size:16px !important; /* prevents iOS auto-zoom */
-    min-height:36px;
-    padding:6px 6px;
+  /* CRITICAL: inputs inside invoice table keep small font/height
+     Only raise font-size to 16px to stop iOS zoom — but no min-height
+     so table rows stay compact */
+  .invoice input[type=text],
+  .invoice input[type=number],
+  .invoice input[type=date],
+  .invoice select,
+  .invoice textarea{
+    font-size:16px !important;
     -webkit-appearance:none;
-    border-radius:4px;
-    touch-action: manipulation;
   }
 
-  /* Table inputs stay full width */
-  table.g td{ padding:2px 3px; }
-
-  /* From/To columns stack better */
-  table.g tr td:first-child,
-  table.g tr td:nth-child(2){ min-width:0; }
-
-  /* Po/Seal/Trailer mini table */
-  table.g td table td{ padding:2px 3px; font-size:11px; }
-  table.g td table input{ font-size:14px !important; }
-
-  /* Totals table full width on mobile */
-  .sub-sec{ justify-content: stretch; }
+  /* Totals table stretches full width */
+  .sub-sec{ justify-content:stretch; }
   table.tot{ width:100%; min-width:unset; }
 
-  /* Modal full screen on mobile */
-  .modal-box{
-    width:96vw;
-    max-width:96vw;
-    padding:16px 14px;
-    max-height:90vh;
-    overflow-y:auto;
-  }
-  .modal-box input{ min-height:40px; font-size:16px !important; }
+  /* Modals nearly full screen */
+  .modal-box{ width:96vw; max-width:96vw; padding:16px 12px; max-height:90vh; overflow-y:auto; }
+  .modal-box input{ font-size:16px !important; min-height:40px; }
+  .detail-box{ width:98vw; max-width:98vw; max-height:92vh; padding:14px 10px; }
 
-  /* Detail modal full screen */
-  .detail-box{
-    width:98vw;
-    max-width:98vw;
-    max-height:92vh;
-    padding:14px 12px;
-  }
-
-  /* Payment cards */
-  .pay-card-footer button{ min-height:40px; font-size:12px; }
-  .pf-row input{ min-height:40px; font-size:16px !important; }
-  .pf-apply{ min-height:40px; padding:8px 14px; }
-
-  /* Company manager rows */
-  .co-row{ flex-direction:column; align-items:flex-start; gap:6px; padding:8px 6px; }
-  .co-btns{ width:100%; display:flex; gap:6px; }
-  .co-btns button{ flex:1; min-height:40px; font-size:13px; }
-
-  /* DB panel table — horizontal scroll */
-  .dbpanel{ padding:8px; overflow-x:auto; }
-  table.dbt{ min-width:600px; }
-
-  /* Summary bar smaller text */
-  .sum-box .sval{ font-size:14px; }
-  .sum-box .slbl{ font-size:10px; }
-
-  /* Filter tabs */
-  .ftab{ padding:10px 10px; font-size:11px; min-height:44px; }
-
-  /* Add pay box */
+  /* Payment tracker buttons taller */
+  .pay-card-footer button{ min-height:44px; font-size:12px; }
+  .pf-row input{ font-size:16px !important; min-height:40px; }
+  .pf-apply{ min-height:40px; }
   .add-pay-box input,
   .add-pay-box textarea{ font-size:16px !important; min-height:40px; }
-  .add-pay-btn{ min-height:44px; font-size:14px; }
+  .add-pay-btn{ min-height:44px; }
+  .ftab{ min-height:44px; padding:10px 8px; }
 
-  /* Co panel */
-  .co-panel{ padding:10px 8px; }
+  /* Company panel rows stack */
+  .co-row{ flex-direction:column; align-items:flex-start; gap:6px; padding:8px 6px; }
+  .co-btns{ width:100%; }
+  .co-btns button{ flex:1; min-height:40px; }
 
-  /* Invoice title smaller */
-  .inv-title{ font-size:20px; }
+  /* DB table scrolls horizontally */
+  .dbpanel{ overflow-x:auto; padding:8px; }
+  table.dbt{ min-width:580px; }
 
-  /* Footer bar */
-  .footer-bar{ font-size:12px; padding:5px 0; }
+  .sum-box .sval{ font-size:14px; }
+  .sum-box .slbl{ font-size:10px; }
 }
 
-/* Extra small phones */
 @media (max-width: 380px){
-  .toolbar .btn{ flex: 1 1 100%; max-width:100%; }
-  .company-name{ font-size:14px; }
-  .logo-box{ width:70px; height:58px; }
-  .inv-title{ font-size:17px; }
+  .toolbar .btn{ flex:1 1 100%; max-width:100%; }
+  .logo-box{ width:65px; height:54px; }
 }
-
-/* Touch action fix — all interactive elements */
-button, input, select, textarea, a {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(0,0,0,0.1);
-}
-
-/* Prevent double-tap zoom on buttons */
-button { touch-action: manipulation; }
 
 @media print{
   .toolbar,.dbpanel,.no-print,.modal-overlay,.app-tabs,.detail-modal,.co-panel{display:none!important;}
