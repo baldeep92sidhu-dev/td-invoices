@@ -214,13 +214,13 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
 <!-- APP TABS -->
 <div class="app-tabs">
   <button class="app-tab active" id="tab-invoice" onclick="switchApp('invoice')">📄 Invoice</button>
+  <button class="app-tab" id="tab-saved" onclick="switchApp('saved')">🗂 Saved Invoices</button>
   <button class="app-tab" id="tab-tracker" onclick="switchApp('tracker')">📊 Payment Tracker</button>
 </div>
 
 <!-- ══ INVOICE APP ══ -->
 <div class="app active" id="app-invoice">
   <div class="toolbar no-print" style="margin-top:8px;">
-    <button class="btn btn-orange" onclick="toggleDB()">📄 Saved Invoices</button>
     <button class="btn btn-green" onclick="openAddCompany()">🏢 Add Company</button>
     <button class="btn btn-orange" onclick="toggleCoPanel()">✏️ Manage Companies</button>
     <button class="btn btn-green" onclick="newInvoice()">+ New Invoice</button>
@@ -307,11 +307,18 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
         </td>
         <td colspan="2" valign="top">
           <table style="width:100%;border-collapse:collapse;font-size:12px;">
-            <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Po Number</td><td style="border:1px solid #999;padding:2px 4px;"><input type="text" id="poNum" class="req-field" style="width:100%;border:none;background:transparent;text-align:right;"></td></tr>
-            <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Seal Number</td><td style="border:1px solid #999;padding:2px 4px;"><input type="text" id="sealNum" class="req-field" style="width:100%;border:none;background:transparent;text-align:right;"></td></tr>
+            <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Po Num</td><td style="border:1px solid #999;padding:2px 4px;"><input type="text" id="poNum" class="req-field" style="width:100%;border:none;background:transparent;text-align:right;"></td></tr>
+            <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Seal</td><td style="border:1px solid #999;padding:2px 4px;"><input type="text" id="sealNum" class="req-field" style="width:100%;border:none;background:transparent;text-align:right;"></td></tr>
             <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Pickups</td><td style="border:1px solid #999;padding:2px 4px;"><input type="text" id="pickups" style="width:100%;border:none;background:transparent;text-align:right;"></td></tr>
             <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Drops</td><td style="border:1px solid #999;padding:2px 4px;"><input type="text" id="drops" style="width:100%;border:none;background:transparent;text-align:right;"></td></tr>
-            <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Trailer</td><td style="border:1px solid #999;padding:2px 4px;"><input type="text" id="trailer" class="req-field" style="width:100%;border:none;background:transparent;text-align:right;"></td></tr>
+            <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Truck</td><td style="border:1px solid #999;padding:2px 4px;">
+              <input type="text" id="truckNum" list="truckList" class="req-field" placeholder="Truck #" style="width:100%;border:none;background:transparent;text-align:right;">
+              <datalist id="truckList"></datalist>
+            </td></tr>
+            <tr><td style="font-weight:bold;border:1px solid #999;padding:3px 5px;background:#e8f5e9;">Trailer</td><td style="border:1px solid #999;padding:2px 4px;">
+              <input type="text" id="trailer" list="trailerList" class="req-field" placeholder="Trailer #" style="width:100%;border:none;background:transparent;text-align:right;">
+              <datalist id="trailerList"></datalist>
+            </td></tr>
           </table>
         </td>
       </tr>
@@ -356,13 +363,24 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
     <div class="footer-bar">Thank you for your Business With Us</div>
   </div>
 
-  <div class="dbpanel no-print" id="dbpanel">
-    <h3>📄 Saved Invoices Database</h3>
+  <div class="dbpanel no-print" id="dbpanel" style="display:none;">
+    <h3>📄 Saved Invoices</h3>
     <div class="db-toolbar">
       <button class="btn btn-green" onclick="exportExcel()" style="font-size:11px;padding:6px 12px;">📊 Export to Excel</button>
       <button class="btn btn-red" onclick="clearAllInvoices()" style="font-size:11px;padding:6px 12px;">🗑 Clear All</button>
     </div>
     <div id="dbContent"></div>
+  </div>
+</div>
+
+<!-- ══ SAVED INVOICES APP ══ -->
+<div class="app" id="app-saved">
+  <div style="max-width:820px;margin:0 auto;padding:8px 0;">
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+      <button class="btn btn-green" onclick="exportExcel()" style="font-size:11px;padding:6px 12px;">📊 Export to Excel</button>
+      <button class="btn btn-red" onclick="clearAllInvoices()" style="font-size:11px;padding:6px 12px;">🗑 Clear All</button>
+    </div>
+    <div id="savedDbContent" style="background:#fff;border:1px solid #bbb;padding:10px;font-size:11px;overflow-x:auto;"></div>
   </div>
 </div>
 
@@ -373,6 +391,9 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
       <button class="btn btn-blue" onclick="syncTracker()">🔄 Sync Invoices</button>
       <button class="btn btn-green" onclick="showTPage('list')">📄 Invoices</button>
       <button class="btn btn-orange" onclick="showTPage('reports')">📊 Reports</button>
+      <select id="truckFilter" onchange="applyTruckFilter()" style="font-size:11px;padding:4px 8px;border-radius:8px;border:2px solid #1565c0;color:#1565c0;font-weight:bold;background:#e3f2fd;cursor:pointer;">
+        <option value="all">🚛 All Trucks</option>
+      </select>
     </div>
     <div class="summary-bar">
       <div class="sum-box s-paid"><div class="slbl">Paid</div><div class="sval" id="sumPaid">0</div></div>
@@ -400,8 +421,9 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
 // ================================================================
 var currentCurrency = localStorage.getItem('td_currency') || 'CDN';
 var currentFilter   = 'all';
+var currentTruckFilter = 'all';
 var currentDetailInv = null;
-var editingCo = null; // {list:'bill'|'from', idx:number} — for edit mode
+var editingCo = null;
 
 var billToDB = JSON.parse(localStorage.getItem('td_billto') || 'null') || [
   {name:"Jagger Canada",a1:"53 Hullen Cresent",a2:"Etobicoke,ON",a3:"M9W7B9",ph:"9056129741",em:"sidhubaldeep44@gmail.com"},
@@ -423,15 +445,24 @@ var fromToDB = JSON.parse(localStorage.getItem('td_from') || 'null') || [
   {name:"KENWORTH CHILLICOTHE KC00",a1:"65 KENWORTH DR",a2:"Chillicothe,OH",a3:"45601",ph:"740 774 5223",em:""},
   {name:"BASSI TRADE CO. LTD.",a1:"500 BARMAC DRIVE UNIT 2",a2:"TORONTO,ON",a3:"M9L 2X8",ph:"",em:""}
 ];
+
+// Truck & Trailer databases
+var truckDB   = JSON.parse(localStorage.getItem('td_trucks')   || 'null') || ['1801','1804'];
+var trailerDB = JSON.parse(localStorage.getItem('td_trailers') || 'null') || ['1801','1804'];
+
 var savedInvoices = JSON.parse(localStorage.getItem('td_invoices') || '[]');
 var payments      = JSON.parse(localStorage.getItem('td_payments') || '{}');
 
 // ================================================================
-// PERSIST HELPERS — always write in-memory arrays TO localStorage
+// PERSIST HELPERS
 // ================================================================
 function saveCompanyDB() {
   localStorage.setItem('td_billto', JSON.stringify(billToDB));
   localStorage.setItem('td_from',   JSON.stringify(fromToDB));
+}
+function saveTruckDB() {
+  localStorage.setItem('td_trucks',   JSON.stringify(truckDB));
+  localStorage.setItem('td_trailers', JSON.stringify(trailerDB));
 }
 function persistInvoices() { localStorage.setItem('td_invoices', JSON.stringify(savedInvoices)); }
 function savePayments()    { localStorage.setItem('td_payments', JSON.stringify(payments)); }
@@ -445,6 +476,7 @@ function switchApp(name) {
   document.getElementById('app-'+name).classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
   if (name === 'tracker') syncTracker();
+  if (name === 'saved')   renderSavedPage();
 }
 
 // ================================================================
@@ -478,6 +510,16 @@ function refreshAllSelects() {
   populateSelect('selBillTo', billToDB);
   populateSelect('selFrom',   fromToDB);
   populateSelect('selTo',     fromToDB);
+  populateTruckTrailerSelects();
+}
+
+function populateTruckTrailerSelects() {
+  // Truck datalist
+  var tl = document.getElementById('truckList');
+  if (tl) { tl.innerHTML = ''; truckDB.forEach(function(t){ var o=document.createElement('option'); o.value=t; tl.appendChild(o); }); }
+  // Trailer datalist
+  var rl = document.getElementById('trailerList');
+  if (rl) { rl.innerHTML = ''; trailerDB.forEach(function(t){ var o=document.createElement('option'); o.value=t; rl.appendChild(o); }); }
 }
 function fillFields(db, idx, prefix) {
   if (idx === '') return;
@@ -611,7 +653,35 @@ function renderCoPanel() {
     });
   }
 
-  h += '<div class="co-section-hdr" style="margin-top:10px;">📋 From / To Companies</div>';
+  h += '<div class="co-section-hdr" style="margin-top:10px;">🚛 Truck Numbers</div>';
+  if (truckDB.length === 0) {
+    h += '<div style="padding:6px;color:#888;font-size:12px;">No trucks yet.</div>';
+  } else {
+    truckDB.forEach(function(t, i) {
+      h += '<div class="co-row"><div class="co-info"><strong>Truck: '+t+'</strong></div>'
+        +'<div class="co-btns">'
+        +'<button style="background:#b71c1c;color:#fff;" onclick="deleteTruck('+i+')">🗑</button>'
+        +'</div></div>';
+    });
+  }
+  h += '<div style="padding:6px;display:flex;gap:6px;">'
+    +'<input type="text" id="newTruckInput" placeholder="Add truck #" style="flex:1;padding:4px;font-size:12px;border:1px solid #bbb;border-radius:4px;">'
+    +'<button class="btn btn-green" onclick="addTruckFromPanel()" style="font-size:11px;padding:4px 10px;">+ Add</button></div>';
+
+  h += '<div class="co-section-hdr" style="margin-top:10px;">🚌 Trailer Numbers</div>';
+  if (trailerDB.length === 0) {
+    h += '<div style="padding:6px;color:#888;font-size:12px;">No trailers yet.</div>';
+  } else {
+    trailerDB.forEach(function(t, i) {
+      h += '<div class="co-row"><div class="co-info"><strong>Trailer: '+t+'</strong></div>'
+        +'<div class="co-btns">'
+        +'<button style="background:#b71c1c;color:#fff;" onclick="deleteTrailer('+i+')">🗑</button>'
+        +'</div></div>';
+    });
+  }
+  h += '<div style="padding:6px;display:flex;gap:6px;">'
+    +'<input type="text" id="newTrailerInput" placeholder="Add trailer #" style="flex:1;padding:4px;font-size:12px;border:1px solid #bbb;border-radius:4px;">'
+    +'<button class="btn btn-green" onclick="addTrailerFromPanel()" style="font-size:11px;padding:4px 10px;">+ Add</button></div>';
   if (fromToDB.length === 0) {
     h += '<div style="padding:6px;color:#888;font-size:12px;">No companies yet.</div>';
   } else {
@@ -629,6 +699,27 @@ function renderCoPanel() {
   }
 
   document.getElementById('coContent').innerHTML = h;
+}
+
+function addTruckFromPanel() {
+  var v = (document.getElementById('newTruckInput').value||'').trim();
+  if (!v) return;
+  if (truckDB.indexOf(v) === -1) { truckDB.push(v); saveTruckDB(); populateTruckTrailerSelects(); renderCoPanel(); showToast('Truck '+v+' added!'); }
+  else showToast('Truck '+v+' already exists.');
+}
+function deleteTruck(i) {
+  if (!confirm('Delete Truck "'+truckDB[i]+'"?')) return;
+  truckDB.splice(i,1); saveTruckDB(); populateTruckTrailerSelects(); renderCoPanel(); showToast('Truck deleted.');
+}
+function addTrailerFromPanel() {
+  var v = (document.getElementById('newTrailerInput').value||'').trim();
+  if (!v) return;
+  if (trailerDB.indexOf(v) === -1) { trailerDB.push(v); saveTruckDB(); populateTruckTrailerSelects(); renderCoPanel(); showToast('Trailer '+v+' added!'); }
+  else showToast('Trailer '+v+' already exists.');
+}
+function deleteTrailer(i) {
+  if (!confirm('Delete Trailer "'+trailerDB[i]+'"?')) return;
+  trailerDB.splice(i,1); saveTruckDB(); populateTruckTrailerSelects(); renderCoPanel(); showToast('Trailer deleted.');
 }
 
 function deleteCompany(list, idx) {
@@ -669,6 +760,7 @@ var REQUIRED = [
   {id:'tripNum',label:'Trip #'},
   {id:'poNum',  label:'PO Number'},
   {id:'sealNum',label:'Seal Number'},
+  {id:'truckNum',label:'Truck No.'},
   {id:'trailer',label:'Trailer'},
   {id:'act1',   label:'Activity (row 1)'},
   {id:'rate1',  label:'Rate (row 1)'}
@@ -694,7 +786,8 @@ function validateForm() {
 function collectData() {
   return {
     invNum:gv('invNum'), date:gv('invDate'), tripNum:gv('tripNum'),
-    poNum:gv('poNum'), sealNum:gv('sealNum'), pickups:gv('pickups'), drops:gv('drops'), trailer:gv('trailer'),
+    poNum:gv('poNum'), sealNum:gv('sealNum'), pickups:gv('pickups'), drops:gv('drops'),
+    truckNum:gv('truckNum'), trailer:gv('trailer'),
     billTo:gv('btName'), btAddr1:gv('btAddr1'), btAddr2:gv('btAddr2'), btPostal:gv('btPostal'), btPhone:gv('btPhone'), btEmail:gv('btEmail'),
     from:gv('frName'), frAddr1:gv('frAddr1'), frAddr2:gv('frAddr2'), frPostal:gv('frPostal'), frPhone:gv('frPhone'),
     to:gv('toName'), toAddr1:gv('toAddr1'), toAddr2:gv('toAddr2'), toPostal:gv('toPostal'), toPhone:gv('toPhone'),
@@ -773,6 +866,24 @@ function autoSaveNewCompanies() {
   processSection(fromToDB, 'fr', null,      'From');
   processSection(fromToDB, 'to', null,      'To');
 
+  // Auto-save new truck number
+  var tn = gv('truckNum');
+  if (tn && truckDB.indexOf(tn) === -1) {
+    truckDB.push(tn);
+    saveTruckDB();
+    populateTruckTrailerSelects();
+    newCos.push('Truck ' + tn);
+  }
+
+  // Auto-save new trailer number
+  var tr = gv('trailer');
+  if (tr && trailerDB.indexOf(tr) === -1) {
+    trailerDB.push(tr);
+    saveTruckDB();
+    populateTruckTrailerSelects();
+    newCos.push('Trailer ' + tr);
+  }
+
   if (newCos.length > 0 || updatedCos.length > 0) {
     saveCompanyDB();
     refreshAllSelects();
@@ -801,27 +912,45 @@ function saveInvoice() {
   showToast('Invoice #' + d.invNum + ' saved!');
 }
 
+
 // ================================================================
-// RENDER DB
+// RENDER SAVED INVOICES PAGE (new tab)
 // ================================================================
-function renderDB() {
-  var el = document.getElementById('dbContent');
-  if (savedInvoices.length === 0) { el.innerHTML = '<p style="color:#888;font-size:12px;padding:8px;">No invoices saved yet.</p>'; return; }
-  var h = '<table class="dbt"><tr><th>Inv #</th><th>Date</th><th>Trip #</th><th>Curr</th><th>Bill To</th><th>From</th><th>To</th><th>PO#</th><th>Seal</th><th>Trailer</th><th>Pick</th><th>Drop</th><th>Amount</th><th colspan="2">Actions</th></tr>';
+function renderSavedPage() {
+  var el = document.getElementById('savedDbContent');
+  if (!el) return;
+  if (savedInvoices.length === 0) { el.innerHTML='<p style="color:#888;padding:8px;">No invoices saved yet.</p>'; return; }
   var sorted = savedInvoices.slice().sort(function(a,b){ return (parseInt(b.invNum)||0)-(parseInt(a.invNum)||0); });
+  var h = '<table class="dbt"><tr><th>Inv #</th><th>Date</th><th>Trip #</th><th>Curr</th><th>Bill To</th><th>From</th><th>To</th><th>PO#</th><th>Seal</th><th>Truck</th><th>Trailer</th><th>Pick</th><th>Drop</th><th>Amount</th><th colspan="2">Actions</th></tr>';
   sorted.forEach(function(d) {
     var i = savedInvoices.indexOf(d);
     var sym = d.currency === 'USD' ? 'US$' : 'CA$';
-    h += '<tr><td>'+d.invNum+'</td><td>'+d.date+'</td><td>'+d.tripNum+'</td><td style="text-align:center;font-weight:bold;">'+sym+'</td><td>'+d.billTo+'</td><td>'+d.from+'</td><td>'+d.to+'</td><td>'+d.poNum+'</td><td>'+d.sealNum+'</td><td>'+d.trailer+'</td><td>'+d.pickups+'</td><td>'+d.drops+'</td><td style="text-align:right;font-weight:bold;">'+sym+Number(d.total).toLocaleString('en-CA',{minimumFractionDigits:2})+'</td>'
-      + '<td><button onclick="loadInvoice('+i+')" style="font-size:11px;padding:2px 7px;cursor:pointer;background:#1565c0;color:#fff;border:none;border-radius:3px;">Load</button></td>'
-      + '<td><button onclick="deleteInvoice('+i+')" style="font-size:11px;padding:2px 7px;cursor:pointer;background:#b71c1c;color:#fff;border:none;border-radius:3px;">Del</button></td></tr>';
+    h += '<tr>'
+      +'<td>'+d.invNum+'</td><td>'+d.date+'</td><td>'+d.tripNum+'</td>'
+      +'<td style="text-align:center;font-weight:bold;">'+sym+'</td>'
+      +'<td>'+d.billTo+'</td><td>'+d.from+'</td><td>'+d.to+'</td>'
+      +'<td>'+d.poNum+'</td><td>'+d.sealNum+'</td>'
+      +'<td>'+(d.truckNum||'')+'</td><td>'+d.trailer+'</td>'
+      +'<td>'+d.pickups+'</td><td>'+d.drops+'</td>'
+      +'<td style="text-align:right;font-weight:bold;">'+sym+Number(d.total).toLocaleString('en-CA',{minimumFractionDigits:2})+'</td>'
+      +'<td><button onclick="loadInvoiceFromSaved('+i+')" style="font-size:11px;padding:2px 7px;cursor:pointer;background:#1565c0;color:#fff;border:none;border-radius:3px;">Load</button></td>'
+      +'<td><button onclick="deleteInvoice('+i+')" style="font-size:11px;padding:2px 7px;cursor:pointer;background:#b71c1c;color:#fff;border:none;border-radius:3px;">Del</button></td>'
+      +'</tr>';
   });
   h += '</table>';
   el.innerHTML = h;
 }
-function deleteInvoice(i)    { if(!confirm('Delete Invoice #'+savedInvoices[i].invNum+'?')) return; savedInvoices.splice(i,1); persistInvoices(); renderDB(); autoExportExcel(); showToast('Invoice deleted.'); }
-function clearAllInvoices()  { if(!confirm('Clear ALL saved invoices? Cannot be undone.')) return; savedInvoices=[]; persistInvoices(); renderDB(); showToast('All invoices cleared.'); }
-function toggleDB()          { var p=document.getElementById('dbpanel'); p.style.display=p.style.display==='none'?'block':'none'; renderDB(); }
+
+function loadInvoiceFromSaved(i) {
+  loadInvoice(i);
+  switchApp('invoice');
+}
+
+function renderDB() { renderSavedPage(); }
+function deleteInvoice(i)   { if(!confirm('Delete Invoice #'+savedInvoices[i].invNum+'?')) return; savedInvoices.splice(i,1); persistInvoices(); renderSavedPage(); autoExportExcel(); showToast('Invoice deleted.'); }
+function clearAllInvoices() { if(!confirm('Clear ALL saved invoices? Cannot be undone.')) return; savedInvoices=[]; persistInvoices(); renderSavedPage(); showToast('All invoices cleared.'); }
+function toggleDB()         { switchApp('saved'); }
+
 
 // ================================================================
 // LOAD INVOICE
@@ -841,6 +970,7 @@ function loadInvoice(i) {
   document.getElementById('sealNum').value  = d.sealNum;
   document.getElementById('pickups').value  = d.pickups  || '';
   document.getElementById('drops').value    = d.drops    || '';
+  document.getElementById('truckNum').value = d.truckNum || '';
   document.getElementById('trailer').value  = d.trailer  || '';
   document.getElementById('remarks').value  = d.remarks  || '';
   // Bill To
@@ -911,7 +1041,7 @@ function newInvoice() {
   var curField = parseInt(document.getElementById('invNum').value) || 0;
   document.getElementById('invNum').value = Math.max(maxSaved, curField) + 1;
   document.getElementById('invDate').value = new Date().toISOString().split('T')[0];
-  ['tripNum','poNum','sealNum','pickups','drops','trailer','remarks'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['tripNum','poNum','sealNum','pickups','drops','truckNum','trailer','remarks'].forEach(function(id){ document.getElementById(id).value=''; });
   ['btName','btAddr1','btAddr2','btPostal','btPhone','btEmail','frName','frAddr1','frAddr2','frPostal','frPhone','toName','toAddr1','toAddr2','toPostal','toPhone'].forEach(function(id){ document.getElementById(id).value=''; });
   ['selBillTo','selFrom','selTo'].forEach(function(id){ document.getElementById(id).value=''; });
   [1,2,3].forEach(function(i){ document.getElementById('act'+i).value=''; document.getElementById('rate'+i).value=''; document.getElementById('amt'+i).textContent=''; });
@@ -953,6 +1083,29 @@ function exportExcel()     { if(savedInvoices.length===0){ alert('No invoices to
 // ================================================================
 function getPayment(invNum) { return payments[String(invNum)] || {status:'pending',paidAmount:0,history:[]}; }
 
+function applyTruckFilter() {
+  currentTruckFilter = document.getElementById('truckFilter').value;
+  renderPayList();
+  renderSummaryBar();
+}
+
+function populateTruckFilter() {
+  var sel = document.getElementById('truckFilter');
+  var cur = sel.value;
+  sel.innerHTML = '<option value="all">🚛 All Trucks</option>';
+  // Get unique truck numbers from saved invoices
+  var trucks = [];
+  savedInvoices.forEach(function(inv) {
+    if (inv.truckNum && trucks.indexOf(inv.truckNum) === -1) trucks.push(inv.truckNum);
+  });
+  trucks.sort().forEach(function(t) {
+    var o = document.createElement('option');
+    o.value = t; o.textContent = '🚛 Truck ' + t;
+    sel.appendChild(o);
+  });
+  sel.value = (trucks.indexOf(cur) !== -1 || cur === 'all') ? cur : 'all';
+}
+
 function syncTracker() {
   savedInvoices = JSON.parse(localStorage.getItem('td_invoices') || '[]');
   savedInvoices.forEach(function(inv){ if(!payments[String(inv.invNum)]) payments[String(inv.invNum)]={status:'pending',paidAmount:0,history:[]}; });
@@ -962,17 +1115,22 @@ function syncTracker() {
     var curField = parseInt(document.getElementById('invNum').value) || 0;
     if (maxN >= curField) document.getElementById('invNum').value = maxN + 1;
   }
-  renderPayList(); renderSummaryBar();
+  populateTruckFilter();
+  renderPayList();
+  renderSummaryBar();
   showToast('Synced — ' + savedInvoices.length + ' invoices.');
 }
 
 function renderSummaryBar() {
   var paid=0, pending=0, partial=0;
-  savedInvoices.forEach(function(inv){ var s=getPayment(inv.invNum).status; if(s==='paid') paid++; else if(s==='partial') partial++; else pending++; });
+  var filtered = savedInvoices.filter(function(inv){
+    return currentTruckFilter === 'all' || (inv.truckNum||'') === currentTruckFilter;
+  });
+  filtered.forEach(function(inv){ var s=getPayment(inv.invNum).status; if(s==='paid') paid++; else if(s==='partial') partial++; else pending++; });
   document.getElementById('sumPaid').textContent    = paid;
   document.getElementById('sumPending').textContent = pending;
   document.getElementById('sumPartial').textContent = partial;
-  document.getElementById('sumTotal').textContent   = savedInvoices.length;
+  document.getElementById('sumTotal').textContent   = filtered.length;
 }
 
 function showTPage(name) {
@@ -983,7 +1141,11 @@ function showTPage(name) {
 
 function renderPayList() {
   var el = document.getElementById('payList');
-  var filtered = savedInvoices.filter(function(inv){ return currentFilter==='all'||getPayment(inv.invNum).status===currentFilter; });
+  var filtered = savedInvoices.filter(function(inv){
+    var truckMatch = currentTruckFilter === 'all' || (inv.truckNum||'') === currentTruckFilter;
+    var statusMatch = currentFilter === 'all' || getPayment(inv.invNum).status === currentFilter;
+    return truckMatch && statusMatch;
+  });
   if (filtered.length === 0) { el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa;"><div style="font-size:40px;">📄</div><p>No invoices in this category.</p></div>'; return; }
   var order = {pending:0,partial:1,paid:2};
   filtered.sort(function(a,b){
@@ -996,13 +1158,15 @@ function renderPayList() {
     var paidAmt=p.paidAmount||0; var balance=inv.total-paidAmt;
     var badge=status==='paid'?'<span class="sbadge paid">✓ Paid</span>':status==='partial'?'<span class="sbadge partial">◑ Partial</span>':'<span class="sbadge pending">⚠ Pending</span>';
     var amtInfo=status==='paid'?'<div class="paid-lbl">✓ Fully Paid</div>':status==='partial'?'<div class="partial-lbl">Paid: '+fmtC(paidAmt)+'</div><div class="owed-lbl">Owed: '+fmtC(balance)+'</div>':'<div class="owed-lbl">Unpaid: '+fmtC(inv.total)+'</div>';
+    var truckBadge = inv.truckNum ? '<span style="font-size:10px;background:#e3f2fd;color:#1565c0;font-weight:700;padding:1px 6px;border-radius:8px;margin-left:6px;">🚛 '+inv.truckNum+'</span>' : '';
     h += '<div class="pay-card '+status+'">'
-      +'<div class="pay-card-hdr"><div><span class="pay-invno">#'+inv.invNum+'</span> <span class="pay-invdate">'+inv.date+'</span></div>'+badge+'</div>'
+      +'<div class="pay-card-hdr"><div><span class="pay-invno">#'+inv.invNum+'</span>'+truckBadge+' <span class="pay-invdate">'+inv.date+'</span></div>'+badge+'</div>'
       +'<div class="pay-card-body">'
       +'<div class="prow"><span class="pk">Bill To</span><span class="pv">'+inv.billTo+'</span></div>'
       +'<div class="prow"><span class="pk">From</span><span class="pv">'+inv.from+'</span></div>'
       +'<div class="prow"><span class="pk">To</span><span class="pv">'+inv.to+'</span></div>'
       +'<div class="prow"><span class="pk">Trip # / PO</span><span class="pv">'+inv.tripNum+' / '+inv.poNum+'</span></div>'
+      +(inv.truckNum?'<div class="prow"><span class="pk">Truck / Trailer</span><span class="pv">'+inv.truckNum+' / '+(inv.trailer||'-')+'</span></div>':'')
       +'<div class="amt-section"><div><div style="font-size:10px;color:#888;margin-bottom:2px;">Invoice Total</div><div class="pay-total">'+fmtC(inv.total)+'</div></div><div style="text-align:right;">'+amtInfo+'</div></div>'
       +'</div>'
       +'<div class="pay-card-footer">'
@@ -1177,6 +1341,7 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
 
   setCurrency(currentCurrency);
   refreshAllSelects();
+  populateTruckTrailerSelects();
   document.getElementById('invDate').value = new Date().toISOString().split('T')[0];
   calc();
   document.querySelectorAll('.req-field').forEach(function(el){ el.addEventListener('input',function(){ this.classList.remove('req-error'); }); });
