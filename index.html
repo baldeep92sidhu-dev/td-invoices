@@ -161,8 +161,10 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
   .toolbar,.dbpanel,.no-print,.modal-overlay,.app-tabs,.detail-modal,.co-panel{display:none!important;}
   body{background:#fff;padding:0;}
   .invoice{border:none;max-width:100%;}
-  .app{display:block!important;}
+  .app{display:none!important;}
+  #app-invoice{display:block!important;}
   #app-tracker{display:none!important;}
+  #app-saved{display:none!important;}
   input,select,textarea{border:none!important;background:transparent!important;-webkit-appearance:none;}
   select{color:#000!important;}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
@@ -795,7 +797,7 @@ function collectData() {
     act2:gv('act2'), rate2:gv('rate2'),
     act3:gv('act3'), rate3:gv('rate3'),
     remarks:gv('remarks'), total:getTotal(), currency:currentCurrency,
-    pdfPath:'C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\t\\' + (gv('btName')||'Unknown').replace(/[\/:*?"<>|]/g,'_') + '\\TDCarriers_Invoice_' + gv('invNum') + '.pdf'
+    pdfPath:'C:\\Users\\laptop\\OneDrive\\Desktop\\T&D\\' + (gv('tripNum')||'Unknown').replace(/[\/:*?"<>|]/g,'_') + '\\TDCarriers_Invoice_' + gv('invNum') + '.pdf'
   };
 }
 
@@ -1083,27 +1085,25 @@ function exportExcel()     { if(savedInvoices.length===0){ alert('No invoices to
 // ================================================================
 function getPayment(invNum) { return payments[String(invNum)] || {status:'pending',paidAmount:0,history:[]}; }
 
-function applyTruckFilter() {
-  currentTruckFilter = document.getElementById('truckFilter').value;
-  renderPayList();
-  renderSummaryBar();
-}
 
 function populateTruckFilter() {
   var sel = document.getElementById('truckFilter');
-  var cur = sel.value;
+  var cur = currentTruckFilter; // use the JS variable, not .value which may be stale
   sel.innerHTML = '<option value="all">🚛 All Trucks</option>';
-  // Get unique truck numbers from saved invoices
+  // Get unique non-empty truck numbers from saved invoices
   var trucks = [];
   savedInvoices.forEach(function(inv) {
-    if (inv.truckNum && trucks.indexOf(inv.truckNum) === -1) trucks.push(inv.truckNum);
+    var t = (inv.truckNum||'').trim();
+    if (t && trucks.indexOf(t) === -1) trucks.push(t);
   });
   trucks.sort().forEach(function(t) {
     var o = document.createElement('option');
     o.value = t; o.textContent = '🚛 Truck ' + t;
     sel.appendChild(o);
   });
-  sel.value = (trucks.indexOf(cur) !== -1 || cur === 'all') ? cur : 'all';
+  // Restore previous selection only if it still exists
+  sel.value = (trucks.indexOf(cur) !== -1) ? cur : 'all';
+  currentTruckFilter = sel.value;
 }
 
 function syncTracker() {
@@ -1137,6 +1137,16 @@ function showTPage(name) {
   document.querySelectorAll('.tpage').forEach(function(p){ p.classList.remove('active'); });
   document.getElementById('tpage-'+name).classList.add('active');
   if (name === 'reports') renderReports();
+}
+
+function applyTruckFilter() {
+  var sel = document.getElementById('truckFilter');
+  currentTruckFilter = sel.value;
+  renderPayList();
+  renderSummaryBar();
+  // If reports page is active, re-render it too
+  var rpage = document.getElementById('tpage-reports');
+  if (rpage && rpage.classList.contains('active')) renderReports();
 }
 
 function renderPayList() {
@@ -1274,26 +1284,114 @@ function deletePayRecord(invNum,idx) {
 // REPORTS
 // ================================================================
 function renderReports() {
-  var el=document.getElementById('reportsContent');
-  if(savedInvoices.length===0){ el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa;"><div style="font-size:40px;">📊</div><p>No data yet.</p></div>'; return; }
-  var paid=0,pending=0,partial=0,paidCDN=0,paidUSD=0,pendingCDN=0,pendingUSD=0,partialCollected=0,partialOwed=0;
-  savedInvoices.forEach(function(inv){
-    var p=getPayment(inv.invNum); var s=p.status||'pending'; var isCDN=(inv.currency||'CDN')==='CDN';
-    if(s==='paid'){ paid++; if(isCDN) paidCDN+=inv.total; else paidUSD+=inv.total; }
-    else if(s==='partial'){ partial++; partialCollected+=(p.paidAmount||0); partialOwed+=inv.total-(p.paidAmount||0); }
-    else{ pending++; if(isCDN) pendingCDN+=inv.total; else pendingUSD+=inv.total; }
+  var el = document.getElementById('reportsContent');
+  if (savedInvoices.length === 0) { el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa;"><div style="font-size:40px;">📊</div><p>No data yet.</p></div>'; return; }
+
+  // Apply truck filter
+  var isTruckFiltered = currentTruckFilter !== 'all';
+  var invoices = savedInvoices.filter(function(inv){
+    return !isTruckFiltered || (inv.truckNum||'').trim() === currentTruckFilter;
   });
-  var pendingInvs=savedInvoices.filter(function(i){ return getPayment(i.invNum).status==='pending'; });
-  var h='';
-  h+='<div class="rcard"><div class="rcard-hdr">📊 Overview</div><div class="rcard-body"><div class="rrow"><span class="rk">Total Invoices</span><span class="rv">'+savedInvoices.length+'</span></div><div class="rrow"><span class="rk">Paid</span><span class="rv rv-g">'+paid+'</span></div><div class="rrow"><span class="rk">Partial</span><span class="rv rv-o">'+partial+'</span></div><div class="rrow"><span class="rk">Pending</span><span class="rv rv-r">'+pending+'</span></div></div></div>';
-  h+='<div class="rcard"><div class="rcard-hdr rg">✓ Paid</div><div class="rcard-body">'+(paidCDN>0?'<div class="rrow"><span class="rk">CA$ Collected</span><span class="rv rv-g">CA$'+paidCDN.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>':'')+(paidUSD>0?'<div class="rrow"><span class="rk">US$ Collected</span><span class="rv rv-g">US$'+paidUSD.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>':'')+'</div></div>';
-  if(partial>0) h+='<div class="rcard"><div class="rcard-hdr ro">◑ Partially Paid</div><div class="rcard-body"><div class="rrow"><span class="rk">Count</span><span class="rv rv-o">'+partial+'</span></div><div class="rrow"><span class="rk">Collected So Far</span><span class="rv rv-o">CA$'+partialCollected.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div><div class="rrow"><span class="rk">Still Owed</span><span class="rv rv-r">CA$'+partialOwed.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div></div></div>';
-  if(pending>0){
-    h+='<div class="rcard"><div class="rcard-hdr rr">⚠ Pending (Unpaid)</div><div class="rcard-body">'+(pendingCDN>0?'<div class="rrow"><span class="rk">CA$ Outstanding</span><span class="rv rv-r">CA$'+pendingCDN.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>':'')+(pendingUSD>0?'<div class="rrow"><span class="rk">US$ Outstanding</span><span class="rv rv-r">US$'+pendingUSD.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>':'');
-    pendingInvs.forEach(function(inv){ h+='<div class="rrow"><span class="rk">#'+inv.invNum+' — '+inv.billTo+'</span><span class="rv rv-r">'+fmtC(inv.total)+'</span></div>'; });
-    h+='</div></div>';
+
+  if (invoices.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;"><div style="font-size:40px;">🚛</div><p>No invoices found for Truck ' + currentTruckFilter + '.</p></div>';
+    return;
   }
-  el.innerHTML=h;
+
+  var paid=0, pending=0, partial=0;
+  var paidCDN=0, paidUSD=0;
+  var pendingCDN=0, pendingUSD=0;
+  var partialCollected=0, partialOwed=0;
+
+  invoices.forEach(function(inv) {
+    var p = getPayment(inv.invNum);
+    var s = p.status || 'pending';
+    var isCDN = (inv.currency||'CDN') === 'CDN';
+    if (s === 'paid') {
+      paid++;
+      if (isCDN) paidCDN += inv.total; else paidUSD += inv.total;
+    } else if (s === 'partial') {
+      partial++;
+      partialCollected += (p.paidAmount||0);
+      partialOwed += inv.total - (p.paidAmount||0);
+    } else {
+      pending++;
+      if (isCDN) pendingCDN += inv.total; else pendingUSD += inv.total;
+    }
+  });
+
+  // Pending and partial invoices for this filter
+  var pendingInvs = invoices.filter(function(i){ return getPayment(i.invNum).status === 'pending'; });
+  var partialInvs = invoices.filter(function(i){ return getPayment(i.invNum).status === 'partial'; });
+
+  var truckLabel = isTruckFiltered ? ' — Truck ' + currentTruckFilter : '';
+  var h = '';
+
+  // Overview
+  h += '<div class="rcard"><div class="rcard-hdr">📊 Overview' + truckLabel + '</div><div class="rcard-body">'
+    + '<div class="rrow"><span class="rk">Total Invoices</span><span class="rv">'+invoices.length+'</span></div>'
+    + '<div class="rrow"><span class="rk">Paid</span><span class="rv rv-g">'+paid+'</span></div>'
+    + '<div class="rrow"><span class="rk">Partial</span><span class="rv rv-o">'+partial+'</span></div>'
+    + '<div class="rrow"><span class="rk">Pending</span><span class="rv rv-r">'+pending+'</span></div>'
+    + '</div></div>';
+
+  // When truck is selected — show ONLY pending + outstanding (as requested)
+  if (isTruckFiltered) {
+    // Outstanding balance summary
+    var totalOutstanding = pendingCDN + pendingUSD + partialOwed;
+    h += '<div class="rcard"><div class="rcard-hdr rr">⚠ Outstanding Balance — Truck ' + currentTruckFilter + '</div><div class="rcard-body">';
+    if (pendingCDN > 0) h += '<div class="rrow"><span class="rk">CA$ Unpaid</span><span class="rv rv-r">CA$' + pendingCDN.toLocaleString('en-CA',{minimumFractionDigits:2}) + '</span></div>';
+    if (pendingUSD > 0) h += '<div class="rrow"><span class="rk">US$ Unpaid</span><span class="rv rv-r">US$' + pendingUSD.toLocaleString('en-CA',{minimumFractionDigits:2}) + '</span></div>';
+    if (partialOwed > 0) h += '<div class="rrow"><span class="rk">Partially Owed</span><span class="rv rv-o">CA$' + partialOwed.toLocaleString('en-CA',{minimumFractionDigits:2}) + '</span></div>';
+    if (totalOutstanding === 0) h += '<div class="rrow"><span class="rk" style="color:#2e7d32;">✓ No outstanding balance</span></div>';
+    h += '</div></div>';
+
+    // List pending invoices
+    if (pendingInvs.length > 0) {
+      h += '<div class="rcard"><div class="rcard-hdr rr">⚠ Pending Invoices</div><div class="rcard-body">';
+      pendingInvs.forEach(function(inv) {
+        h += '<div class="rrow"><span class="rk">#'+inv.invNum+' — '+inv.billTo+'<br><span style="font-size:10px;color:#aaa;">'+inv.date+' | Trip: '+inv.tripNum+'</span></span><span class="rv rv-r">'+fmtC(inv.total)+'</span></div>';
+      });
+      h += '</div></div>';
+    }
+
+    // List partial invoices
+    if (partialInvs.length > 0) {
+      h += '<div class="rcard"><div class="rcard-hdr ro">◑ Partially Paid</div><div class="rcard-body">';
+      partialInvs.forEach(function(inv) {
+        var p = getPayment(inv.invNum);
+        var owed = inv.total - (p.paidAmount||0);
+        h += '<div class="rrow"><span class="rk">#'+inv.invNum+' — '+inv.billTo+'<br><span style="font-size:10px;color:#aaa;">Paid: '+fmtC(p.paidAmount||0)+'</span></span><span class="rv rv-o">Owed: '+fmtC(owed)+'</span></div>';
+      });
+      h += '</div></div>';
+    }
+
+  } else {
+    // All trucks — show full report
+    h += '<div class="rcard"><div class="rcard-hdr rg">✓ Paid</div><div class="rcard-body">'
+      + (paidCDN>0?'<div class="rrow"><span class="rk">CA$ Collected</span><span class="rv rv-g">CA$'+paidCDN.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>':'')
+      + (paidUSD>0?'<div class="rrow"><span class="rk">US$ Collected</span><span class="rv rv-g">US$'+paidUSD.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>':'')
+      + (paidCDN===0&&paidUSD===0?'<div class="rrow"><span class="rk">No paid invoices yet.</span></div>':'')
+      + '</div></div>';
+
+    if (partial > 0) {
+      h += '<div class="rcard"><div class="rcard-hdr ro">◑ Partially Paid</div><div class="rcard-body">'
+        + '<div class="rrow"><span class="rk">Count</span><span class="rv rv-o">'+partial+'</span></div>'
+        + '<div class="rrow"><span class="rk">Collected So Far</span><span class="rv rv-o">CA$'+partialCollected.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>'
+        + '<div class="rrow"><span class="rk">Still Owed</span><span class="rv rv-r">CA$'+partialOwed.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>'
+        + '</div></div>';
+    }
+
+    if (pending > 0) {
+      h += '<div class="rcard"><div class="rcard-hdr rr">⚠ Pending (Unpaid)</div><div class="rcard-body">'
+        + (pendingCDN>0?'<div class="rrow"><span class="rk">CA$ Outstanding</span><span class="rv rv-r">CA$'+pendingCDN.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>':'')
+        + (pendingUSD>0?'<div class="rrow"><span class="rk">US$ Outstanding</span><span class="rv rv-r">US$'+pendingUSD.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></div>':'');
+      pendingInvs.forEach(function(inv){ h += '<div class="rrow"><span class="rk">#'+inv.invNum+' — '+inv.billTo+'</span><span class="rv rv-r">'+fmtC(inv.total)+'</span></div>'; });
+      h += '</div></div>';
+    }
+  }
+
+  el.innerHTML = h;
 }
 
 // ================================================================
@@ -1349,5 +1447,4 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
 })();
 </script>
 </body>
-
 </html>
