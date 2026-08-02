@@ -168,7 +168,6 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
   input,select,textarea{border:none!important;background:transparent!important;-webkit-appearance:none;}
   select{color:#000!important;}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
-  #selBillTo,#selFrom,#selTo{display:none!important;}
   #btName,#frName,#toName{font-weight:900!important;font-size:11px!important;}
   .invoice input[type=text]:placeholder-shown{display:none!important;}
 }
@@ -274,12 +273,8 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
       <tr>
         <td style="width:50%" rowspan="2" valign="top">
           <span class="sh" style="display:block;padding:4px;">Bill To:</span>
-          <div style="margin:2px 0 4px;">
-            <select id="selBillTo" onchange="fillBillTo(this.value)">
-              <option value="">-- Select Company --</option>
-            </select>
-          </div>
-          <input type="text" id="btName" placeholder="Company Name" class="req-field" style="margin-bottom:2px;">
+          <input type="text" id="btName" list="billToList" placeholder="Company Name" class="req-field" style="margin-bottom:2px;" oninput="autoFillCompany('bt',this.value,billToDB)">
+          <datalist id="billToList"></datalist>
           <input type="text" id="btAddr1" placeholder="Address 1" style="margin-bottom:2px;">
           <input type="text" id="btAddr2" placeholder="City, Province" style="margin-bottom:2px;">
           <input type="text" id="btPostal" placeholder="Postal Code" style="margin-bottom:2px;">
@@ -305,16 +300,16 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
       </tr>
       <tr>
         <td valign="top">
-          <select id="selFrom" onchange="fillFrom(this.value)" style="margin-bottom:4px;"><option value="">-- Select Company --</option></select>
-          <input type="text" id="frName" placeholder="Company" class="req-field" style="margin-bottom:2px;">
+          <input type="text" id="frName" list="fromList" placeholder="Company" class="req-field" style="margin-bottom:2px;" oninput="autoFillCompany('fr',this.value,fromToDB)">
+          <datalist id="fromList"></datalist>
           <input type="text" id="frAddr1" placeholder="Address 1" style="margin-bottom:2px;">
           <input type="text" id="frAddr2" placeholder="City, Province" style="margin-bottom:2px;">
           <input type="text" id="frPostal" placeholder="Postal/ZIP" style="margin-bottom:2px;">
           <input type="text" id="frPhone" placeholder="Phone">
         </td>
         <td valign="top">
-          <select id="selTo" onchange="fillTo(this.value)" style="margin-bottom:4px;"><option value="">-- Select Company --</option></select>
-          <input type="text" id="toName" placeholder="Company" class="req-field" style="margin-bottom:2px;">
+          <input type="text" id="toName" list="toList" placeholder="Company" class="req-field" style="margin-bottom:2px;" oninput="autoFillCompany('to',this.value,fromToDB)">
+          <datalist id="toList"></datalist>
           <input type="text" id="toAddr1" placeholder="Address 1" style="margin-bottom:2px;">
           <input type="text" id="toAddr2" placeholder="City, Province" style="margin-bottom:2px;">
           <input type="text" id="toPostal" placeholder="Postal/ZIP" style="margin-bottom:2px;">
@@ -352,7 +347,8 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
       <tr>
         <td colspan="3">
           <span style="font-weight:bold;color:#1a237e;font-size:12px;">Remarks:</span>
-          <textarea id="remarks" style="height:22px;resize:none;"></textarea>
+          <input type="text" id="remarks" list="remarksList" placeholder="Remarks..." style="width:100%;border:1px dashed #bbb;padding:2px 4px;font-size:11px;font-family:Arial;background:#fffde7;">
+          <datalist id="remarksList"></datalist>
           <div style="margin-top:5px;font-size:12px;font-weight:bold;color:#1a237e;">Make cheques payable to: <span style="color:#1565c0;">dispatch@tdcarriers.ca</span></div>
         </td>
       </tr>
@@ -403,11 +399,35 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
 <div class="app" id="app-tracker">
   <div class="tracker-wrap">
     <div class="tracker-toolbar" style="margin-top:8px;">
-      <button class="btn btn-blue" onclick="syncTracker()">🔄 Sync Invoices</button>
+      <button class="btn btn-blue" onclick="syncTracker()">🔄 Sync</button>
       <button class="btn btn-green" onclick="showTPage('list')">📄 Invoices</button>
       <button class="btn btn-orange" onclick="showTPage('reports')">📊 Reports</button>
       <select id="truckFilter" onchange="applyTruckFilter()" style="font-size:11px;padding:4px 8px;border-radius:8px;border:2px solid #1565c0;color:#1565c0;font-weight:bold;background:#e3f2fd;cursor:pointer;">
         <option value="all">🚛 All Trucks</option>
+      </select>
+      <button class="btn btn-orange" onclick="toggleTrackerSearch()" style="padding:6px 10px;font-size:14px;">🔍</button>
+    </div>
+
+    <!-- Item 6: Search bar -->
+    <div id="trackerSearchBar" style="display:none;margin-bottom:8px;background:#fff;border:1px solid #1a237e;border-radius:8px;padding:8px 10px;">
+      <input type="text" id="trackerSearchInput" placeholder="Search by Invoice #, Trip #, PO#, Bill To..." 
+        oninput="applyTrackerFilters()"
+        style="width:100%;border:1px solid #bbb;border-radius:5px;padding:6px 8px;font-size:12px;font-family:Arial;">
+    </div>
+
+    <!-- Item 7: Date range filter -->
+    <div style="display:flex;gap:6px;margin-bottom:8px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid #ddd;border-radius:8px;padding:6px 10px;">
+      <span style="font-size:11px;font-weight:700;color:#1a237e;">📅 Date:</span>
+      <input type="date" id="dateFrom" onchange="applyTrackerFilters()" style="font-size:11px;padding:3px 5px;border:1px solid #bbb;border-radius:4px;background:#fffde7;">
+      <span style="font-size:11px;color:#888;">to</span>
+      <input type="date" id="dateTo" onchange="applyTrackerFilters()" style="font-size:11px;padding:3px 5px;border:1px solid #bbb;border-radius:4px;background:#fffde7;">
+      <button onclick="clearDateFilter()" style="font-size:10px;padding:3px 8px;border:none;border-radius:4px;background:#ffebee;color:#b71c1c;font-weight:700;cursor:pointer;">✕ Clear</button>
+      <select id="quickDateFilter" onchange="applyQuickDate()" style="font-size:11px;padding:3px 5px;border:1px solid #bbb;border-radius:4px;background:#e3f2fd;color:#1565c0;font-weight:700;cursor:pointer;">
+        <option value="">Quick Select</option>
+        <option value="thismonth">This Month</option>
+        <option value="lastmonth">Last Month</option>
+        <option value="last3">Last 3 Months</option>
+        <option value="thisyear">This Year</option>
       </select>
     </div>
     <div class="summary-bar">
@@ -511,44 +531,54 @@ function fmtC(n)   { return Number(n||0).toLocaleString('en-CA',{minimumFraction
 // DROPDOWNS
 // ================================================================
 function populateSelect(selId, db) {
-  var sel = document.getElementById(selId);
-  var cur = sel.value;
-  sel.innerHTML = '<option value="">-- Select Company --</option>';
-  db.forEach(function(c, i) {
-    var o = document.createElement('option');
-    o.value = i; o.textContent = c.name;
-    sel.appendChild(o);
-  });
-  sel.value = cur;
+  var dl = document.getElementById(selId);
+  if (!dl) return;
+  dl.innerHTML = '';
+  db.forEach(function(c){ var o=document.createElement('option'); o.value=c.name; dl.appendChild(o); });
 }
 function refreshAllSelects() {
-  populateSelect('selBillTo', billToDB);
-  populateSelect('selFrom',   fromToDB);
-  populateSelect('selTo',     fromToDB);
+  populateSelect('billToList', billToDB);
+  populateSelect('fromList',   fromToDB);
+  populateSelect('toList',     fromToDB);
   populateTruckTrailerSelects();
 }
 
 function populateTruckTrailerSelects() {
-  // Truck datalist
   var tl = document.getElementById('truckList');
-  if (tl) { tl.innerHTML = ''; truckDB.forEach(function(t){ var o=document.createElement('option'); o.value=t; tl.appendChild(o); }); }
-  // Trailer datalist
+  if (tl) { tl.innerHTML=''; truckDB.forEach(function(t){ var o=document.createElement('option'); o.value=t; tl.appendChild(o); }); }
   var rl = document.getElementById('trailerList');
-  if (rl) { rl.innerHTML = ''; trailerDB.forEach(function(t){ var o=document.createElement('option'); o.value=t; rl.appendChild(o); }); }
+  if (rl) { rl.innerHTML=''; trailerDB.forEach(function(t){ var o=document.createElement('option'); o.value=t; rl.appendChild(o); }); }
+}
+
+// Auto-fill address when a known company name is typed/selected
+function autoFillCompany(prefix, name, db) {
+  if (!name) return;
+  var n = name.trim().toLowerCase();
+  for (var i=0; i<db.length; i++) {
+    if (db[i].name.trim().toLowerCase() === n) {
+      var c = db[i];
+      document.getElementById(prefix+'Addr1').value  = c.a1 || '';
+      document.getElementById(prefix+'Addr2').value  = c.a2 || '';
+      document.getElementById(prefix+'Postal').value = c.a3 || '';
+      document.getElementById(prefix+'Phone').value  = c.ph || '';
+      if (document.getElementById(prefix+'Email')) document.getElementById(prefix+'Email').value = c.em || '';
+      return;
+    }
+  }
 }
 function fillFields(db, idx, prefix) {
-  if (idx === '') return;
-  var c = db[parseInt(idx)]; if (!c) return;
+  if (idx==='') return;
+  var c=db[parseInt(idx)]; if(!c) return;
   document.getElementById(prefix+'Name').value   = c.name;
-  document.getElementById(prefix+'Addr1').value  = c.a1 || '';
-  document.getElementById(prefix+'Addr2').value  = c.a2 || '';
-  document.getElementById(prefix+'Postal').value = c.a3 || '';
-  document.getElementById(prefix+'Phone').value  = c.ph || '';
-  if (document.getElementById(prefix+'Email')) document.getElementById(prefix+'Email').value = c.em || '';
+  document.getElementById(prefix+'Addr1').value  = c.a1||'';
+  document.getElementById(prefix+'Addr2').value  = c.a2||'';
+  document.getElementById(prefix+'Postal').value = c.a3||'';
+  document.getElementById(prefix+'Phone').value  = c.ph||'';
+  if(document.getElementById(prefix+'Email')) document.getElementById(prefix+'Email').value=c.em||'';
 }
-function fillBillTo(v) { fillFields(billToDB, v, 'bt'); }
-function fillFrom(v)   { fillFields(fromToDB, v, 'fr'); }
-function fillTo(v)     { fillFields(fromToDB, v, 'to'); }
+function fillBillTo(v) { autoFillCompany('bt', v, billToDB); }
+function fillFrom(v)   { autoFillCompany('fr', v, fromToDB); }
+function fillTo(v)     { autoFillCompany('to', v, fromToDB); }
 
 // ================================================================
 // COMPANY MODAL — open for ADD
@@ -923,14 +953,127 @@ function saveInvoice() {
   if (idx >= 0) { if (!confirm('Invoice #' + d.invNum + ' already saved. Overwrite?')) return; savedInvoices[idx] = d; }
   else savedInvoices.push(d);
   if (!payments[d.invNum]) payments[d.invNum] = {status:'pending', paidAmount:0, history:[]};
-  persistInvoices(); savePayments(); renderDB(); autoExportExcel();
+  persistInvoices(); savePayments(); renderDB(); autoExportExcel(); populateRemarksList();
   showToast('Invoice #' + d.invNum + ' saved!');
 }
 
 
 // ================================================================
-// SEARCH INVOICE
+// ITEM 6: TRACKER SEARCH
 // ================================================================
+var trackerSearchOpen = false;
+function toggleTrackerSearch() {
+  trackerSearchOpen = !trackerSearchOpen;
+  var bar = document.getElementById('trackerSearchBar');
+  bar.style.display = trackerSearchOpen ? 'block' : 'none';
+  if (trackerSearchOpen) document.getElementById('trackerSearchInput').focus();
+  else { document.getElementById('trackerSearchInput').value=''; applyTrackerFilters(); }
+}
+
+// ================================================================
+// ITEM 7: DATE RANGE FILTER
+// ================================================================
+function applyQuickDate() {
+  var v = document.getElementById('quickDateFilter').value;
+  if (!v) return;
+  var now = new Date();
+  var from, to;
+  if (v === 'thismonth') {
+    from = new Date(now.getFullYear(), now.getMonth(), 1);
+    to   = new Date(now.getFullYear(), now.getMonth()+1, 0);
+  } else if (v === 'lastmonth') {
+    from = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    to   = new Date(now.getFullYear(), now.getMonth(), 0);
+  } else if (v === 'last3') {
+    from = new Date(now.getFullYear(), now.getMonth()-3, 1);
+    to   = now;
+  } else if (v === 'thisyear') {
+    from = new Date(now.getFullYear(), 0, 1);
+    to   = new Date(now.getFullYear(), 11, 31);
+  }
+  document.getElementById('dateFrom').value = from.toISOString().split('T')[0];
+  document.getElementById('dateTo').value   = to.toISOString().split('T')[0];
+  document.getElementById('quickDateFilter').value = '';
+  applyTrackerFilters();
+}
+
+function clearDateFilter() {
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value   = '';
+  document.getElementById('quickDateFilter').value = '';
+  applyTrackerFilters();
+}
+
+// ================================================================
+// COMBINED FILTER — truck + status + search + date
+// ================================================================
+function applyTrackerFilters() {
+  renderPayList();
+  renderSummaryBar();
+  var rpage = document.getElementById('tpage-reports');
+  if (rpage && rpage.classList.contains('active')) renderReports();
+}
+
+function getFilteredInvoices() {
+  var q        = (document.getElementById('trackerSearchInput') ? document.getElementById('trackerSearchInput').value.trim().toLowerCase() : '');
+  var dateFrom = document.getElementById('dateFrom') ? document.getElementById('dateFrom').value : '';
+  var dateTo   = document.getElementById('dateTo')   ? document.getElementById('dateTo').value   : '';
+
+  return savedInvoices.filter(function(inv) {
+    // Truck filter
+    var truckOk = currentTruckFilter === 'all' || (inv.truckNum||'').trim() === currentTruckFilter;
+    // Status filter
+    var statusOk = currentFilter === 'all' || getPayment(inv.invNum).status === currentFilter;
+    // Search filter
+    var searchOk = !q ||
+      (inv.invNum||'').toLowerCase().indexOf(q) !== -1 ||
+      (inv.tripNum||'').toLowerCase().indexOf(q) !== -1 ||
+      (inv.poNum||'').toLowerCase().indexOf(q) !== -1 ||
+      (inv.billTo||'').toLowerCase().indexOf(q) !== -1;
+    // Date filter
+    var dateOk = true;
+    if (dateFrom || dateTo) {
+      var d = inv.date || '';
+      if (dateFrom && d < dateFrom) dateOk = false;
+      if (dateTo   && d > dateTo)   dateOk = false;
+    }
+    return truckOk && statusOk && searchOk && dateOk;
+  });
+}
+
+// ================================================================
+// ITEM 8: REMARKS AUTO-SUGGESTIONS
+// ================================================================
+var DEFAULT_REMARKS = [
+  'Pickup June - Delivery June',
+  'Hazmat load',
+  'Overweight permit required',
+  'Temperature controlled',
+  'Expedited delivery',
+  'Driver assist required',
+  'No dock — floor load',
+  'Cross border — US customs cleared',
+  'Appointment required for delivery',
+  'Lumper service required'
+];
+
+function populateRemarksList() {
+  var dl = document.getElementById('remarksList');
+  if (!dl) return;
+  dl.innerHTML = '';
+  // Collect previously used remarks from saved invoices
+  var used = [];
+  savedInvoices.forEach(function(inv){
+    var r = (inv.remarks||'').trim();
+    if (r && used.indexOf(r) === -1) used.push(r);
+  });
+  // Merge defaults + used, deduplicated
+  var all = DEFAULT_REMARKS.slice();
+  used.forEach(function(r){ if (all.indexOf(r) === -1) all.push(r); });
+  all.forEach(function(r){
+    var o = document.createElement('option'); o.value = r; dl.appendChild(o);
+  });
+}
 function openSearch() {
   document.getElementById('searchInput').value = '';
   document.getElementById('searchResults').innerHTML = '<div style="color:#888;font-size:12px;padding:8px;">Type to search...</div>';
@@ -958,6 +1101,10 @@ function runSearch() {
     return;
   }
 
+  // Check for duplicate trip numbers across all results
+  var tripCount = {};
+  savedInvoices.forEach(function(inv){ var t=(inv.tripNum||'').trim(); if(t) tripCount[t]=(tripCount[t]||0)+1; });
+
   var h = '';
   results.forEach(function(inv) {
     var i = savedInvoices.indexOf(inv);
@@ -973,7 +1120,7 @@ function runSearch() {
       + '<span style="font-weight:900;color:#1a237e;font-size:13px;">#'+inv.invNum+'</span>'
       + badge
       + '</div>'
-      + '<div style="font-size:11px;color:#555;margin-bottom:2px;">📅 '+inv.date+' &nbsp;|&nbsp; 🚛 Trip: <b>'+inv.tripNum+'</b></div>'
+      + '<div style="font-size:11px;color:#555;margin-bottom:2px;">📅 '+inv.date+' &nbsp;|&nbsp; 🚛 Trip: <b>'+inv.tripNum+'</b>'+(tripCount[inv.tripNum]>1?' <span style="color:#e65100;font-weight:900;" title="Duplicate Trip #">⚠ Duplicate</span>':'')+'</div>'
       + '<div style="font-size:11px;color:#555;margin-bottom:2px;">📋 PO: '+inv.poNum+' &nbsp;|&nbsp; 🏢 '+inv.billTo+'</div>'
       + '<div style="font-size:11px;font-weight:700;color:#1a237e;text-align:right;">'+sym+Number(inv.total).toLocaleString('en-CA',{minimumFractionDigits:2})+'</div>'
       + '</div>';
@@ -991,25 +1138,104 @@ function renderSavedPage() {
   var el = document.getElementById('savedDbContent');
   if (!el) return;
   if (savedInvoices.length === 0) { el.innerHTML='<p style="color:#888;padding:8px;">No invoices saved yet.</p>'; return; }
+
+  // ── Item 4: Summary totals ──
+  var totCDN=0, totUSD=0, pendCDN=0, pendUSD=0, paidCount=0, pendCount=0, partCount=0;
+  savedInvoices.forEach(function(inv){
+    var s = getPayment(inv.invNum).status;
+    var isCDN = (inv.currency||'CDN')==='CDN';
+    if(s==='paid'){ paidCount++; }
+    else if(s==='partial'){ partCount++; if(isCDN) pendCDN+=inv.total; else pendUSD+=inv.total; }
+    else { pendCount++; if(isCDN) pendCDN+=inv.total; else pendUSD+=inv.total; }
+    if(isCDN) totCDN+=inv.total; else totUSD+=inv.total;
+  });
+
+  var summary = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#ddd;margin-bottom:10px;">'
+    +'<div style="background:#fff;padding:8px;text-align:center;"><div style="font-size:10px;color:#888;font-weight:700;text-transform:uppercase;">Total Inv</div><div style="font-size:15px;font-weight:900;color:#1a237e;">'+savedInvoices.length+'</div></div>'
+    +'<div style="background:#fff;padding:8px;text-align:center;"><div style="font-size:10px;color:#888;font-weight:700;text-transform:uppercase;">Paid</div><div style="font-size:15px;font-weight:900;color:#2e7d32;">'+paidCount+'</div></div>'
+    +'<div style="background:#fff;padding:8px;text-align:center;"><div style="font-size:10px;color:#888;font-weight:700;text-transform:uppercase;">Pending</div><div style="font-size:15px;font-weight:900;color:#b71c1c;">'+pendCount+'</div></div>'
+    +'<div style="background:#fff;padding:8px;text-align:center;"><div style="font-size:10px;color:#888;font-weight:700;text-transform:uppercase;">Partial</div><div style="font-size:15px;font-weight:900;color:#e65100;">'+partCount+'</div></div>'
+    +'</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding:8px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;">'
+    +(totCDN>0?'<span style="font-size:12px;font-weight:700;color:#1a237e;">CA$ Total: <span style="color:#2e7d32;">'+totCDN.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></span>':'')
+    +(totUSD>0?'<span style="font-size:12px;font-weight:700;color:#1a237e;margin-left:12px;">US$ Total: <span style="color:#2e7d32;">'+totUSD.toLocaleString('en-CA',{minimumFractionDigits:2})+'</span></span>':'')
+    +'<span style="margin-left:auto;font-size:12px;font-weight:700;color:#b71c1c;">Outstanding: '
+    +(pendCDN>0?'CA$'+pendCDN.toLocaleString('en-CA',{minimumFractionDigits:2}):'')
+    +(pendUSD>0?' US$'+pendUSD.toLocaleString('en-CA',{minimumFractionDigits:2}):'')
+    +(pendCDN===0&&pendUSD===0?'<span style="color:#2e7d32;">None ✓</span>':'')
+    +'</span></div>';
+
   var sorted = savedInvoices.slice().sort(function(a,b){ return (parseInt(b.invNum)||0)-(parseInt(a.invNum)||0); });
-  var h = '<table class="dbt"><tr><th>Inv #</th><th>Date</th><th>Trip #</th><th>Curr</th><th>Bill To</th><th>From</th><th>To</th><th>PO#</th><th>Seal</th><th>Truck</th><th>Trailer</th><th>Pick</th><th>Drop</th><th>Amount</th><th colspan="2">Actions</th></tr>';
+
+  // ── Item 2: detect duplicate trip numbers ──
+  var tripCount = {};
+  savedInvoices.forEach(function(inv){ var t=(inv.tripNum||'').trim(); if(t) tripCount[t]=(tripCount[t]||0)+1; });
+
+  var h = '<div style="overflow-x:auto;"><table class="dbt"><tr>'
+    +'<th>Inv #</th><th>Date</th><th>Trip #</th><th>Curr</th><th>Bill To</th>'
+    +'<th>From</th><th>To</th><th>PO#</th><th>Seal</th><th>Truck</th><th>Trailer</th>'
+    +'<th>Pick</th><th>Drop</th><th>Amount</th><th>Status</th><th colspan="2">Actions</th></tr>';
+
   sorted.forEach(function(d) {
     var i = savedInvoices.indexOf(d);
     var sym = d.currency === 'USD' ? 'US$' : 'CA$';
-    h += '<tr>'
-      +'<td>'+d.invNum+'</td><td>'+d.date+'</td><td>'+d.tripNum+'</td>'
+    var p = getPayment(d.invNum);
+    var s = p.status || 'pending';
+
+    // ── Item 3: row color by payment status ──
+    var rowBg = s==='paid' ? '#f1f8e9' : s==='partial' ? '#fff8e1' : '#fff';
+    var statusCell = s==='paid'
+      ? '<span style="background:#e8f5e9;color:#2e7d32;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700;">✓ Paid</span>'
+      : s==='partial'
+      ? '<span style="background:#fff3e0;color:#e65100;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700;">◑ Part</span>'
+      : '<span style="background:#ffebee;color:#b71c1c;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700;">⚠ Pend</span>';
+
+    // ── Item 2: flag duplicate trip numbers ──
+    var tripDisplay = d.tripNum;
+    if (tripCount[d.tripNum] > 1) {
+      tripDisplay += ' <span title="Duplicate Trip #" style="color:#e65100;font-weight:900;">⚠</span>';
+    }
+
+    h += '<tr style="background:'+rowBg+';">'
+      +'<td style="font-weight:700;">'+d.invNum+'</td>'
+      +'<td>'+d.date+'</td>'
+      +'<td>'+tripDisplay+'</td>'
       +'<td style="text-align:center;font-weight:bold;">'+sym+'</td>'
       +'<td>'+d.billTo+'</td><td>'+d.from+'</td><td>'+d.to+'</td>'
       +'<td>'+d.poNum+'</td><td>'+d.sealNum+'</td>'
       +'<td>'+(d.truckNum||'')+'</td><td>'+d.trailer+'</td>'
       +'<td>'+d.pickups+'</td><td>'+d.drops+'</td>'
       +'<td style="text-align:right;font-weight:bold;">'+sym+Number(d.total).toLocaleString('en-CA',{minimumFractionDigits:2})+'</td>'
-      +'<td><button onclick="loadInvoiceFromSaved('+i+')" style="font-size:11px;padding:2px 7px;cursor:pointer;background:#1565c0;color:#fff;border:none;border-radius:3px;">Load</button></td>'
-      +'<td><button onclick="deleteInvoice('+i+')" style="font-size:11px;padding:2px 7px;cursor:pointer;background:#b71c1c;color:#fff;border:none;border-radius:3px;">Del</button></td>'
+      +'<td>'+statusCell+'</td>'
+      +'<td>'
+        +'<button onclick="quickMarkPaid(\''+d.invNum+'\')" title="Mark Paid" style="font-size:10px;padding:1px 5px;cursor:pointer;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;border-radius:3px;margin-right:2px;">✓</button>'
+        +'<button onclick="quickMarkPending(\''+d.invNum+'\')" title="Mark Pending" style="font-size:10px;padding:1px 5px;cursor:pointer;background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a;border-radius:3px;">✕</button>'
+      +'</td>'
+      +'<td>'
+        +'<button onclick="loadInvoiceFromSaved('+i+')" style="font-size:11px;padding:2px 6px;cursor:pointer;background:#1565c0;color:#fff;border:none;border-radius:3px;margin-right:2px;">Load</button>'
+        +'<button onclick="deleteInvoice('+i+')" style="font-size:11px;padding:2px 6px;cursor:pointer;background:#b71c1c;color:#fff;border:none;border-radius:3px;">Del</button>'
+      +'</td>'
       +'</tr>';
   });
-  h += '</table>';
-  el.innerHTML = h;
+  h += '</table></div>';
+  el.innerHTML = summary + h;
+}
+
+function quickMarkPaid(invNum) {
+  var inv = savedInvoices.find(function(i){ return String(i.invNum)===String(invNum); });
+  if (!inv) return;
+  var p = getPayment(invNum);
+  p.status='paid'; p.paidAmount=inv.total;
+  if (!p.history) p.history=[];
+  p.history.push({date:new Date().toISOString().split('T')[0],amount:inv.total,note:'Marked paid from Saved Invoices'});
+  payments[String(invNum)]=p; savePayments(); renderSavedPage();
+  showToast('Invoice #'+invNum+' marked as PAID.');
+}
+function quickMarkPending(invNum) {
+  var p = getPayment(invNum);
+  p.status='pending'; p.paidAmount=0; p.history=[];
+  payments[String(invNum)]=p; savePayments(); renderSavedPage();
+  showToast('Invoice #'+invNum+' set to PENDING.');
 }
 
 function loadInvoiceFromSaved(i) {
@@ -1035,7 +1261,9 @@ function findInDB(db, name) {
 function loadInvoice(i) {
   var d = savedInvoices[i];
   document.getElementById('invNum').value   = d.invNum;
-  document.getElementById('invDate').value  = d.date;
+  // Item 1: if date is placeholder, default to today
+  var loadDate = (d.date && d.date !== '2025-01-01') ? d.date : new Date().toISOString().split('T')[0];
+  document.getElementById('invDate').value  = loadDate;
   document.getElementById('tripNum').value  = d.tripNum;
   document.getElementById('poNum').value    = d.poNum;
   document.getElementById('sealNum').value  = d.sealNum;
@@ -1114,7 +1342,6 @@ function newInvoice() {
   document.getElementById('invDate').value = new Date().toISOString().split('T')[0];
   ['tripNum','poNum','sealNum','pickups','drops','truckNum','trailer','remarks'].forEach(function(id){ document.getElementById(id).value=''; });
   ['btName','btAddr1','btAddr2','btPostal','btPhone','btEmail','frName','frAddr1','frAddr2','frPostal','frPhone','toName','toAddr1','toAddr2','toPostal','toPhone'].forEach(function(id){ document.getElementById(id).value=''; });
-  ['selBillTo','selFrom','selTo'].forEach(function(id){ document.getElementById(id).value=''; });
   [1,2,3].forEach(function(i){ document.getElementById('act'+i).value=''; document.getElementById('rate'+i).value=''; document.getElementById('amt'+i).textContent=''; });
   REQUIRED.forEach(function(f){ document.getElementById(f.id).classList.remove('req-error'); });
   calc();
@@ -1192,9 +1419,7 @@ function syncTracker() {
 
 function renderSummaryBar() {
   var paid=0, pending=0, partial=0;
-  var filtered = savedInvoices.filter(function(inv){
-    return currentTruckFilter === 'all' || (inv.truckNum||'') === currentTruckFilter;
-  });
+  var filtered = getFilteredInvoices();
   filtered.forEach(function(inv){ var s=getPayment(inv.invNum).status; if(s==='paid') paid++; else if(s==='partial') partial++; else pending++; });
   document.getElementById('sumPaid').textContent    = paid;
   document.getElementById('sumPending').textContent = pending;
@@ -1211,20 +1436,12 @@ function showTPage(name) {
 function applyTruckFilter() {
   var sel = document.getElementById('truckFilter');
   currentTruckFilter = sel.value;
-  renderPayList();
-  renderSummaryBar();
-  // If reports page is active, re-render it too
-  var rpage = document.getElementById('tpage-reports');
-  if (rpage && rpage.classList.contains('active')) renderReports();
+  applyTrackerFilters();
 }
 
 function renderPayList() {
   var el = document.getElementById('payList');
-  var filtered = savedInvoices.filter(function(inv){
-    var truckMatch = currentTruckFilter === 'all' || (inv.truckNum||'') === currentTruckFilter;
-    var statusMatch = currentFilter === 'all' || getPayment(inv.invNum).status === currentFilter;
-    return truckMatch && statusMatch;
-  });
+  var filtered = getFilteredInvoices();
   if (filtered.length === 0) { el.innerHTML='<div style="text-align:center;padding:40px;color:#aaa;"><div style="font-size:40px;">📄</div><p>No invoices in this category.</p></div>'; return; }
   var order = {pending:0,partial:1,paid:2};
   filtered.sort(function(a,b){
@@ -1471,7 +1688,7 @@ document.querySelector('.filter-tabs').addEventListener('click',function(e){
   document.querySelectorAll('.ftab').forEach(function(t){ t.classList.remove('active'); });
   tab.classList.add('active');
   currentFilter=tab.getAttribute('data-filter');
-  renderPayList();
+  applyTrackerFilters();
 });
 
 // ================================================================
@@ -1509,6 +1726,7 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
   setCurrency(currentCurrency);
   refreshAllSelects();
   populateTruckTrailerSelects();
+  populateRemarksList();
   document.getElementById('invDate').value = new Date().toISOString().split('T')[0];
   calc();
   document.querySelectorAll('.req-field').forEach(function(el){ el.addEventListener('input',function(){ this.classList.remove('req-error'); }); });
