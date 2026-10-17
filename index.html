@@ -241,6 +241,7 @@ table.dbt tr:nth-child(even){background:#f9f9f9;}
     <button class="btn btn-blue" onclick="autoSaveNewCompanies();window.print();">🖨 Save as PDF</button>
     <button class="btn btn-green" onclick="exportExcel()">📊 Export Excel</button>
     <button class="btn btn-orange" onclick="openSearch()" style="padding:6px 10px;font-size:14px;">🔍</button>
+    <button class="btn btn-red" onclick="clearForm()" style="padding:6px 10px;font-size:13px;">🗑 Clear</button>
   </div>
 
   <!-- Company Manager Panel -->
@@ -1354,6 +1355,40 @@ function loadInvoice(i) {
   document.getElementById('dbpanel').style.display = 'none';
   window.scrollTo(0, 0);
   showToast('Invoice #' + d.invNum + ' loaded.');
+}
+
+// ================================================================
+// CLEAR FORM — clears all fields, keeps invoice number and date
+// ================================================================
+function clearForm() {
+  if (!confirm('Clear all fields on this invoice?\nInvoice # and date will be kept.')) return;
+
+  // Company fields
+  ['btName','btAddr1','btAddr2','btPostal','btPhone','btEmail',
+   'frName','frAddr1','frAddr2','frPostal','frPhone',
+   'toName','toAddr1','toAddr2','toPostal','toPhone'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) { el.value = ''; el.style.border = ''; el.style.background = ''; }
+  });
+
+  // Trip/logistics fields
+  ['tripNum','poNum','sealNum','pickups','drops','truckNum','trailer','remarks'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) { el.value = ''; el.style.border = ''; el.style.background = ''; }
+  });
+
+  // Activity rows
+  [1,2,3].forEach(function(i){
+    document.getElementById('act'+i).value  = '';
+    document.getElementById('rate'+i).value = '';
+    document.getElementById('amt'+i).textContent = '';
+  });
+
+  // Clear req-error highlights
+  REQUIRED.forEach(function(f){ document.getElementById(f.id).classList.remove('req-error'); });
+
+  calc();
+  showToast('Form cleared — Invoice #' + gv('invNum') + ' ready to fill.');
 }
 
 // ================================================================
