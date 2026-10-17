@@ -947,6 +947,31 @@ function saveInvoice() {
   if (missing.length > 0) { alert('Please fill in all required fields:\n\n• ' + missing.join('\n• ')); return; }
   var d = collectData();
   if (!d.invNum) { alert('Please enter an Invoice Number.'); return; }
+  // ── Duplicate check — warn if Trip #, PO #, or Seal already exists on a DIFFERENT invoice ──
+  var newInvNum  = d.invNum;
+  var newTrip    = (d.tripNum||'').trim().toLowerCase();
+  var newPO      = (d.poNum||'').trim().toLowerCase();
+  var newSeal    = (d.sealNum||'').trim().toLowerCase();
+  var dupWarnings = [];
+
+  savedInvoices.forEach(function(inv){
+    if (String(inv.invNum) === String(newInvNum)) return; // same invoice — skip
+    if (newTrip && (inv.tripNum||'').trim().toLowerCase() === newTrip)
+      dupWarnings.push('Trip # "' + d.tripNum + '" already used on Invoice #' + inv.invNum);
+    if (newPO && (inv.poNum||'').trim().toLowerCase() === newPO)
+      dupWarnings.push('PO # "' + d.poNum + '" already used on Invoice #' + inv.invNum);
+    if (newSeal && newSeal !== 'no seal' && (inv.sealNum||'').trim().toLowerCase() === newSeal)
+      dupWarnings.push('Seal # "' + d.sealNum + '" already used on Invoice #' + inv.invNum);
+  });
+
+  if (dupWarnings.length > 0) {
+    var proceed = confirm(
+      '⚠ Duplicate Warning!\n\n' + dupWarnings.join('\n') +
+      '\n\nDo you still want to save this invoice?'
+    );
+    if (!proceed) return;
+  }
+
   // Auto-save any new companies entered in the form
   autoSaveNewCompanies();
   var idx = savedInvoices.findIndex(function(x){ return x.invNum === d.invNum; });
@@ -1730,6 +1755,33 @@ function showToast(msg){ var t=document.getElementById('toast'); t.textContent=m
   document.getElementById('invDate').value = new Date().toISOString().split('T')[0];
   calc();
   document.querySelectorAll('.req-field').forEach(function(el){ el.addEventListener('input',function(){ this.classList.remove('req-error'); }); });
+
+  // Live duplicate check on Trip #, PO #, Seal fields
+  ['tripNum','poNum','sealNum'].forEach(function(fieldId){
+    var el = document.getElementById(fieldId);
+    if (!el) return;
+    el.addEventListener('blur', function(){
+      var val = this.value.trim().toLowerCase();
+      if (!val || val === 'no seal') return;
+      var curInvNum = document.getElementById('invNum').value.trim();
+      var dups = savedInvoices.filter(function(inv){
+        if (String(inv.invNum) === String(curInvNum)) return false;
+        if (fieldId === 'tripNum')  return (inv.tripNum||'').trim().toLowerCase()  === val;
+        if (fieldId === 'poNum')    return (inv.poNum||'').trim().toLowerCase()    === val;
+        if (fieldId === 'sealNum')  return (inv.sealNum||'').trim().toLowerCase()  === val;
+        return false;
+      });
+      if (dups.length > 0) {
+        this.style.border = '2px solid #e65100';
+        this.style.background = '#fff3e0';
+        var label = fieldId==='tripNum'?'Trip #':fieldId==='poNum'?'PO #':'Seal #';
+        showToast('⚠ ' + label + ' already used on Invoice #' + dups.map(function(d){return d.invNum;}).join(', '));
+      } else {
+        this.style.border = '';
+        this.style.background = '';
+      }
+    });
+  });
   syncTracker();
 })();
 </script>
